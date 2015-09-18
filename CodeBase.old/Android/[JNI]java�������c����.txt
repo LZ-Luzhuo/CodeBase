@@ -1,0 +1,83 @@
+//---------------------------------
+// 1.在java中定义c方法的接口
+// 2.生成头文件：进入工程src目录-->	javah 全类名
+// 3.把头文件放到jni文件夹下，在c代码用导入
+// 4.拷贝头文件里的方法到c代码文件，开始写c代码
+// 5.拷贝Android.mk文件
+// 6.交叉编译：进入工程根目录-->	ndk-build
+// 7.java中引入函数库
+// 8.java中调用其方法
+//----------Luzhuo-write-----------
+
+
+
+//---------------------------------
+// 一些常用的c方法的接口
+//================以下定义c方法接口部分=================
+
+	public native int add(int x ,int y);
+	public native String sayHelloInC(String s);
+	public native int[] intMethod(int[] iNum);
+
+//================以上定义c方法接口部分=================
+
+
+//---------------------------------
+// 修改导入的头文件名
+// c代码导入部分
+//================以下c代码导入部分=================
+
+#include <stdio.h>
+#include "com_example_candandroid_DataProvider.h"
+#include <string.h>
+
+//================以上c代码导入部分=================
+
+
+//---------------------------------
+// 对应的c方法
+// 方法体要自己写，以下是示范代码，不可直接使用
+// 接收字符串时，需要调用Jstring2CStr(env,str);方法将String转成char，详见《[JNI]java字符串转成c的char.txt》
+//================以下c方法示范部分=================
+
+//把x和y相加
+JNIEXPORT jint JNICALL Java_com_example_candandroid_DataProvider_add
+  (JNIEnv * env, jobject obj, jint x, jint y){
+	return x+y;
+}
+//把收到的字符串加上hello
+JNIEXPORT jstring JNICALL Java_com_example_candandroid_DataProvider_sayHelloInC
+  (JNIEnv * env, jobject obj, jstring str){
+	char* c="hello";
+	char* cstr=Jstring2CStr(env,str);
+	strcat(cstr,c);
+	return (*env)->NewStringUTF(env,cstr);
+}
+//遍历数组，每个元素+5
+JNIEXPORT jintArray JNICALL Java_com_example_candandroid_DataProvider_intMethod
+  (JNIEnv * env, jobject obj, jintArray jarray){
+	//(*GetArrayLength)(JNIEmv*, jarray); //获取数组的长度
+	int length=(*env)->GetArrayLength(env,jarray);
+	//(*GetIntArrayElements)(JNIEnv*, jintArray, jboolean*); //遍历数组
+	int* array=(*env)->GetIntArrayElements(env,jarray,0);
+	int i=0;
+	for(;i<length;i++){
+		*(array+i)+=5;
+	}
+	return jarray;
+}
+
+//================以上c方法示范部分=================
+
+
+//---------------------------------
+// 在java中引入函数库
+// 如果在Android.mk中修改了名称，则这里也应修改成相应的名称
+//================以下引入函数库部分=================
+
+	static{
+		System.loadLibrary("hello");
+	}
+
+//================以上引入函数库部分=================
+

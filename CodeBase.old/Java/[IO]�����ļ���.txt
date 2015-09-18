@@ -1,0 +1,58 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L321513
+// 2.拷贝文件夹，以及文件夹下的文件
+//-------------------------------------------------------
+
+//=============================================================
+
+public static void main(String[] args) throws IOException {
+	File shujuyuan = new File("haha"); //数据源  L321513
+	if(!shujuyuan.exists()){
+		System.out.println("数据源有问题");
+	}
+	File mudidi = new File("hehe"); //目的地  L321513
+	if(!mudidi.exists()){
+		mudidi.mkdirs();
+	}
+	
+	copyDir(shujuyuan,mudidi);
+}	
+//拷贝文件夹
+private static void copyDir(File shujuyuan,File mudidi) throws IOException{
+	if(shujuyuan.isDirectory()){ //是文件夹
+		File dir = new File(mudidi,shujuyuan.getName());
+		dir.mkdirs(); //新建文件夹
+		File[] fileArray = shujuyuan.listFiles();
+		for(File file : fileArray){ //遍历数据源File
+			copyDir(file,dir); //拷贝文件夹，给个遍历File，新文件名
+		}
+	}else{ //是文件
+		File file = new File(mudidi,shujuyuan.getName());
+		file.createNewFile();
+		copy(shujuyuan,file); //拷贝文件，给个数据源，给个新文件名
+	}
+}
+//拷贝文件
+private static void copy(File shujuyuan, File file) throws IOException{
+	BufferedInputStream bis = null;
+	BufferedOutputStream bos = null;
+	try{
+		bis = new BufferedInputStream(new FileInputStream(shujuyuan));
+		bos = new BufferedOutputStream(new FileOutputStream(file));
+		
+		byte[] bys = new byte[1024];
+		int len = 0;
+		while((len=bis.read(bys))!=-1){
+			bos.write(bys,0,len);
+			bos.flush();
+		}
+	}catch(IOException e){
+	}finally{
+		if(bos!=null)
+			bos.close();
+		if(bis!=null)
+			bis.close();
+	}
+}
+
+//=============================================================

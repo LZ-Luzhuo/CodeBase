@@ -1,0 +1,74 @@
+//-----------------------------------------------------
+// 1.需修改的位置编号：L513156
+// 2.URLConnection的两种请求方式：Get/Post
+// 3.Get请求方式的url中带有中文需要URLEncoder编码
+//-------------------------Luzhuo Writer----------------------------
+
+
+//-----------------------------------------------------
+// 1.Get请求
+//=======================================================
+      
+      String data = "?username="+URLEncoder.encode(userName)+"&password="+URLEncoder.encode(password);
+      URL url = new URL("http://192.168.0.103/ServerItheima/servlet/LoginServlet"+data);
+      HttpURLConnection  conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("GET");
+      conn.setConnectTimeout(10000); //设置连接服务器的超时时间，若超时10秒没有连接成功抛异常
+      conn.setReadTimeout(5000);  //设置读取数据时超时时间，若超时5秒抛异常
+      conn.connect(); //开始连接
+      int responseCode = conn.getResponseCode(); //得到服务器的响应码
+      if(responseCode == 200){
+        InputStream is = conn.getInputStream(); //获得服务器返回的流数据
+      }else{
+        System.out.println("request is error");
+      }
+      if(conn != null){
+        conn.disconnect();
+      }
+
+//=======================================================
+
+
+
+
+//-----------------------------------------------------
+// 1.Post请求
+//=======================================================
+
+    URL url = new URL("http://192.168.0.103/ServerItheima/servlet/LoginServlet");
+    HttpURLConnection  conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("POST");
+    conn.setConnectTimeout(10000);
+    conn.setReadTimeout(5000);
+    conn.setDoOutput(true); //允许输出
+  //conn.setRequestProperty("Content-Length", 234); //设置请求头消息，可以设置多个
+    String data = "username="+userName+"&password="+password; 
+    OutputStream out = conn.getOutputStream(); //获得一个输出流
+    out.write(data.getBytes());
+    out.flush();
+    out.close();
+    int responseCode = conn.getResponseCode();
+    if(responseCode == 200){
+      InputStream is = conn.getInputStream();
+    }else{
+      System.out.println("request is error");
+    }
+    if(conn !=null){
+      conn.disconnect();
+    }
+
+//=======================================================
+
+
+
+//-----------------------------------------------------
+// 1.方法全是静态的
+// 2.URLEncoder编码
+//	方法：encode(String s, String enc);	String
+// 3.URLDecodr解码
+//	方法：decode(String s, String enc);	Stirng
+//=======================================================
+
+String data = "?username="+URLEncoder.encode(userName)+"&password="+URLEncoder.encode(password);
+
+//=======================================================

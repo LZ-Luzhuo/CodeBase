@@ -1,0 +1,28 @@
+//---------------------------------
+// 1.在Android.mk末尾加入：	LOCAL_LDLIBS += -llog
+// 2.hello.c导入库
+// 3.方法中调用想在logcat控制台打印的方法
+//----------Luzhuo-write-----------
+
+//---------------------------------
+// 直接复制使用，无需修改
+//================以下导入库部分=================
+
+#include <android/log.h>
+#define LOG_TAG "clog"
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__)
+
+//================以上导入库部=================
+
+
+//---------------------------------
+// 修改参数为 LOGD(要打印的内容);
+// debug输出调用LOGD("x=%d",x);(蓝色)
+// info输出调用LOGI("y=%d",y);(绿色)
+//================以下调用方法部=================
+
+	LOGD("x=%d",x);  //debug
+	LOGI("y=%d",y);  //info
+
+//================以上调用方法部=================

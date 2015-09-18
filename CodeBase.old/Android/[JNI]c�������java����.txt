@@ -1,0 +1,104 @@
+//---------------------------------
+// 1.写c代码
+// 2.	c代码：获取java类的字节码
+// 3.	       获取java中的方法
+// 4.	       调用方法
+//----------Luzhuo-write-----------
+// = 标注表示与其他不一样，需注意的地方
+//---------------------------------
+
+
+
+//---------------------------------
+// 只需修改头文件名就可使用
+//================以下定义导入部分=================
+
+#include <stdio.h>
+#include "com_example_jnicallback_DataProvider.h"
+#include <string.h>
+
+//================以上定义导入部分=================
+
+
+
+//---------------------------------
+// c调用java的空方法
+//   获取java类的字节码
+//   获得普通方法
+//   动用普通方法
+//================以下定义导入部分=================
+
+	//jclass      (*FindClass)(JNIEnv*, const char*); //获取字节码
+	jclass clazz=(*env)->FindClass(env,"com/example/ndkcallback/DataProvider");
+	//jmethodID   (*GetMethodID)(JNIEnv*, jclass, const char*, const char*); //获取方法
+	jmethodID methodId = (*env)->GetMethodID(env,clazz,"helloFromJava","()V");
+	//void        (*CallVoidMethod)(JNIEnv*, jobject, jmethodID, ...); //调用空方法
+	(*env)->CallVoidMethod(env,obj,methodId);
+
+//================以上定义导入部分=================
+
+
+//---------------------------------
+// c调用java的int参数的方法
+//   获取java类的字节码
+//   获得空方法
+//   动用Int方法	=
+//================以下定义导入部分=================
+
+	jclass clazz=(*env)->FindClass(env,"com/example/ndkcallback/DataProvider");
+	jmethodID methodId = (*env)->GetMethodID(env,clazz,"Add","(II)I");
+	//jint        (*CallIntMethod)(JNIEnv*, jobject, jmethodID, ...); //调用int参数方法
+	(*env)->CallIntMethod(env,obj,methodId,3,5);
+
+//================以上定义导入部分=================
+
+
+
+//---------------------------------
+// c调用java的string参数的方法
+//   获取java类的字节码
+//   获得普通方法
+//   动用普通方法
+//================以下定义导入部分=================
+
+	jclass clazz=(*env)->FindClass(env,"com/example/ndkcallback/DataProvider");
+	jmethodID methodId = (*env)->GetMethodID(env,clazz,"printString","(Ljava/lang/String;)V");
+	jstring str=(*env)->NewStringUTF(env,"hello");
+	(*env)->CallVoidMethod(env,obj,methodId,str);
+
+//================以上定义导入部分=================
+
+
+
+//---------------------------------
+// c调用java的静态的方法
+//   获取java类的字节码
+//   获得静态方法	=
+//   动用静态方法	=
+//================以下定义导入部分=================
+
+	jclass clazz=(*env)->FindClass(env,"com/example/ndkcallback/DataProvider");
+	//jmethodID   (*GetStaticMethodID)(JNIEnv*, jclass, const char*, const char*); //获取静态方法
+	jmethodID methodId = (*env)->GetStaticMethodID(env,clazz,"demo","()V");
+	//void        (*CallStaticVoidMethod)(JNIEnv*, jclass, jmethodID, ...); //调用静态方法
+	(*env)->CallStaticVoidMethod(env,clazz,methodId);
+
+//================以上定义导入部分=================
+
+
+//---------------------------------
+// c调用java的其他类的方法
+//   获取其他类的字节码	=
+//   获得普通方法
+//   获得对象	=
+//   动用普通方法
+//================以下定义导入部分=================
+
+	jclass clazz=(*env)->FindClass(env,"com/example/ndkcallback/MainActivity"); //获得该类的字节码
+	jmethodID methodId = (*env)->GetMethodID(env,clazz,"helloFromJava","()V");
+	//jobject     (*AllocObject)(JNIEnv*, jclass);  //创建对象 new MainActivity
+	jobject cobj = (*env)->AllocObject(env,clazz);
+ 	(*env)->CallVoidMethod(env,cobj,methodId);
+
+//================以上定义导入部分=================
+

@@ -1,0 +1,65 @@
+//------------------------注解-----------------------------
+// 1.需修改的位置编号：L165132
+// 2.注解
+//-------------------------Luzhuo Writer----------------------------
+
+
+//-----------------------------------------------------
+// 1.定义注解
+// 2.关键词注释：
+//		@Retention: 指定注解的保留范围
+//		@Target: 指定被修饰的注解可以使用在什么位置
+//		@interface: 关键字定义注解
+// 3.注解属性值详解：
+//		@Retention：
+//			RetentionPolicy.SOURCE: 编译器直接丢弃种种策略的注解
+//			RetentionPolicy.CLASS: 编译器把注解记录在class文件中，JVM不保留注解
+//			RetentionPolicy.RUNTIME: 编译器把注解记录在class文件中，JVM保留注解，程序反射获取注解
+//		@Target:
+//			ElementType.ANNOTATION_TYPE
+//			ElementType.CONSTRUCTOR: 构造
+//			ElementType.FIELD: 字段
+//			ElementType.LOCAL_VARIABLE: 局部变量
+//			ElementType.METHOD: 方法
+//			ElementType.PACKAGE: 包
+//			ElementType.PARAMETER: 参数
+//			ElementType.TYPE: 类或接口(Class/Iterface/Enum/Annocation)
+//
+//=========================DemoAnno.java==============================
+
+@Retention(RetentionPolicy.RUNTIME) //@Retention:指定注解的保留范围
+@Target(ElementType.TYPE) //@Target:指定被修饰的注解可以使用在什么位置
+public @interface DemoAnno { //@interface:关键字定义注解
+	public String name();
+	public int age() default 100;
+}
+
+//=======================================================
+
+
+
+//-----------------------------------------------------
+// 1.注解的使用
+//=========================Student.java==============================
+
+@DemoAnno(name="zhangsan")
+public class Student {
+
+}
+
+//=======================================================
+
+
+
+//-----------------------------------------------------
+// 1.反射注解
+// 2.可以使用反射：Class/Field/Method/Constructor/Package
+//=======================================================
+
+	public static void main(String[] args) {
+		DemoAnno demoAnno = Student.class.getAnnotation(DemoAnno.class);  //获得注解对象
+		String name = demoAnno.name();  //获得注解的值
+		System.out.println(name);  //zhangsan
+	}
+
+//=======================================================

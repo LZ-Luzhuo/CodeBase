@@ -1,0 +1,140 @@
+//-----------------------------------------------------------
+// 1.需修改的位置编号：L153152
+// 2.显式意图、隐式意图
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.显式意图
+// 2.应用程序之间融合在一起的,一般激活自己应用的组件时采用
+//===========================================================
+
+//显示意图
+//方式一
+Intent intent = new Intent(this,CalcActivity.class);
+startActivity(intent);
+
+//方式二
+Intent intent = new Intent();
+intent.setClassName(getPackageName(),”com.itheima.rpcale.CalcActivity”);
+startActivity(intent);
+
+<activity
+    android:name=".CalacActivity"
+    android:label="@string/title_activity_CalacActivity" >
+</activity>
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.隐式意图
+// 2.被启动的活动需要配置清单中的intent-filter
+// 3.应用之间没有耦合,激活别人写的应用时采用,无需关心对方的包名和类名
+//===========================================================
+
+//隐式意图
+Intent intent = new Intent();
+intent.setActivity(“com.itheima.intent2.open2”);
+intent.addCategory(Intent.CATEGORY_DEFAULT);
+intent.setDataAndType(Uri.parse(“jianren:张三”),”application/person”);
+startActivity(intent);
+
+<activity android:name="com.itheima.intent2.SecondActivity"> //界面   <intent-filter > //意图过滤器
+    <action android:name="com.itheima.intent2.open2"/>//动作 可写任意字符串
+    <data android:mimeType="application/person"/>  //数据类型
+    <category android:name="android.intent.category.DEFAULT"/> //与代码里的参数一样           		
+    <data android:scheme="jianren"/> //约束
+  </intent-filter>
+</activity>
+
+//===========================================================
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.值的传递
+//=========================MainActivity.java==================================
+
+public class MainActivity extends Activity {
+	private static final String TAG = "MainActivity";
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		String ziyuan = "null";
+		if(data!=null){
+			ziyuan = data.getStringExtra("ziyuan");
+		}
+		Log.i(TAG, requestCode+","+resultCode+":"+ziyuan);
+		super.onActivityResult(requestCode, resultCode, data);
+	}
+	
+	public void button1(View v){
+		Intent intent = new Intent(this, Activity2.class);
+		intent.putExtra("ziyuan", "ziyuan111");
+		startActivityForResult(intent, 0);
+	}
+	
+	public void button2(View v){
+		Intent intent = new Intent();
+		intent.setAction("com.example.androiddemotest.Activity3");
+		intent.setDataAndType(Uri.parse("activity3:x"), "application/activity");
+		intent.addCategory("android.intent.category.DEFAULT");
+		startActivityForResult(intent, 1);
+	}
+}
+
+//===========================================================
+
+public class Activity2 extends Activity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity2);
+		System.out.println(getIntent().getStringExtra("ziyuan"));
+		super.onCreate(savedInstanceState);
+	}
+	public void click(View v){
+		Intent intent = new Intent();
+		intent.putExtra("ziyuan", "This is a resource");
+		setResult(5,intent);
+		finish();
+	}
+}
+
+//===========================Activity3.java================================
+
+public class Activity3 extends Activity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.activity3);
+		super.onCreate(savedInstanceState);
+	}
+}
+
+//===========================清单文件================================
+
+<activity
+	android:name=".Activity2"
+	android:label="@string/app_name" >
+</activity>
+<activity
+	android:name=".Activity3"
+	android:label="@string/app_name" >
+	<intent-filter>
+		<action android:name="com.example.androiddemotest.Activity3"/>
+		<data android:mimeType="application/activity"/>
+		<category android:name="android.intent.category.DEFAULT"/>		
+		<data android:scheme="activity3"/>
+	</intent-filter>
+</activity>
+
+//===========================================================

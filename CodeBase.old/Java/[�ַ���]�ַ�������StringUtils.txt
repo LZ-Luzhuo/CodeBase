@@ -1,0 +1,22 @@
+//-----------------------字符串工具------------------------------
+// 1.需修改的位置编号：L561325
+// 2.需要jar包:commons-lang3-3.0-beta.jar
+//-------------------------Luzhuo Writer----------------------------
+
+
+//-----------------------------------------------------
+// 1.使用案例代码
+// 2.方法全是静态的
+// 3.方法：isBlack(String text);  							 boolean //是否为空(null,"","  ")
+	   isNotBlack(String text);							 boolean //是否不为空
+	   replaceEach(String text, String[] searchList, String[] replasementList);      String  //替换
+	   subStringBetween(String text, String fromstr, String tostr);			 String  //截取嵌套字符串
+//=======================================================
+
+String str = "abc123efg";
+System.out.println(StringUtils.isBlank(str));  //false
+System.out.println(StringUtils.isNotBlank(str)); //true
+System.out.println(StringUtils.replaceEach(str, new String[]{"a","1"}, new String[]{"c","c"})); //cbcc23efg
+System.out.println(StringUtils.substringBetween(str, "abc", "ef")); //123
+
+//=======================================================

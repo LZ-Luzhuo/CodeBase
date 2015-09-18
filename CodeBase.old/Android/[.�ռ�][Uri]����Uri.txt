@@ -1,0 +1,200 @@
+﻿//---------------------------------
+// 1.需修改的位置编号：L613515
+// 2.Uri介绍见：[内容访问]内容提供者 访问者 观察者简介.txt
+// 3.这里提供Uri：
+//	短信："content://sms/"
+//	短信发件箱："content://sms/outbox"
+//
+//	通讯录：
+//	通讯录联系人id："content://com.android.contacts/raw_contacts"
+//	通讯录联系人数据："content://com.android.contacts/data"
+//
+//	APN：
+//	APN设置信息："content://telephony/carriers/preferapn"  (一般有设置的都是cmwap方式：cmwap 10.0.0.172:80)
+//----------Luzhuo-write-----------
+
+
+//---------------------------------
+// 1.短信："content://sms/"
+// 2.权限: 
+//    <uses-permission android:name="android.permission.READ_SMS"/>
+//    <uses-permission android:name="android.permission.WRITE_SMS"/>
+//================短信读取========================
+
+public void readSms(){
+	//查出所有的短信
+	Uri uri = Uri.parse("content://sms/");
+	ContentResolver resolver = getContext().getContentResolver();
+	Cursor cursor = resolver.query(uri, new String[]{"_id","address","date","type","body"}, null, null, null);
+	if(cursor !=null && cursor.getCount()>0){
+	  while(cursor.moveToNext()){
+	    int id = cursor.getInt(0); //短信id
+	    String address = cursor.getString(1); //短信号码
+	    Long date = cursor.getLong(2); //短信日期
+		    int type = cursor.getInt(3); //短信类型 1接收/2发送
+	    String body = cursor.getString(4); //短信内容
+	    System.out.println(id+":"+address+","+date+","+type+","+body);
+	  }
+	  cursor.close();
+	}
+}
+
+//================短信写入========================
+
+public void writeSms(){
+	//写入短信
+	Uri uri = Uri.parse("content://sms/"); //操作sms表的uri
+	ContentValues values = new ContentValues();
+	values.put("address", "95555");
+	values.put("type", "1");
+	values.put("body", "今晚九点见");
+	getContext().getContentResolver().insert(uri, values);
+}
+
+//================监听短信(发送)========================
+
+//MainActivity.java
+//获得内容提供者对象   监听系统短信
+ContentResolver resolver = getContentResolver();
+//注册一个内容观察者观察短信数据库
+resolver.registerContentObserver(Uri.parse("content://sms/"), true, new ContentObserver(new Handler()) {
+
+	@Override
+	public void onChange(boolean selfChange) {
+		Uri uri = Uri.parse("content://sms/outbox");  //发件箱的uri
+		//查询发件箱的内容
+		Cursor cursor = getContentResolver().query(uri, new String[]{"address","date","body"}, null, null, null);
+		if(cursor !=null && cursor.getCount() >0){
+		while(cursor.moveToNext()){
+			String address = cursor.getString(0);
+			long date = cursor.getLong(1);
+			String body = cursor.getString(2);
+	       		Log.i(TAG, "号码:"+address+",日期:"+date+",内容:"+body);
+	      }
+	    }
+	}
+});
+
+//========================================
+
+
+
+
+
+
+
+
+//---------------------------------
+// 1.通讯录联系人id："content://com.android.contacts/raw_contacts"
+//   通讯录联系人数据："content://com.android.contacts/data"
+// 2.查询：
+//	1.去raw_contacts表中取所有联系人的_id
+//	2.去data表中根据上面取得的_id查询对应id(raw_contact_id)的数据
+// 3.添加：
+//  	1.在raw_contacts表中添加一个记录(contact_id)
+//	2.根据上面添加记录的id,取data表中添加三条数据
+// 4.权限：
+//    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+//    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
+//=================读取通讯录=======================
+
+public void readContacts(){
+	//读取通讯录
+	//1.去raw_contacts表中取所有联系人的_id
+	Uri uri  = Uri.parse("content://com.android.contacts/raw_contacts");
+	Uri dataUri = Uri.parse("content://com.android.contacts/data");
+	Cursor cursor  = getContext().getContentResolver().query(uri, new String[]{"_id"}, null, null, null);
+	if(cursor !=null && cursor.getCount()>0){
+	  while(cursor.moveToNext()){
+	    int id = cursor.getInt(0);
+	    //2.去data表中根据上面取到的_id查询对应id的数据
+	    String selection = "raw_contact_id = ?";
+	    String[] selectionArgs = {String.valueOf(id)};
+	    Cursor c = getContext().getContentResolver().query(dataUri, new String[]{"data1", "mimetype"}, selection,selectionArgs,null);
+	    if(c != null && cursor.getCount()>0){
+	      while(c.moveToNext()){
+	        String mimeType = c.getString(1); //当前取的是mimeType的值
+	        String data1 = c.getString(0); //当前取的是data1数据
+	        if("vnd.android.cursor.item/phone_v2".equals(mimeType)){
+	          Log.i(TAG, "号码："+data1);
+	        }else if("vnd.android.cursor.item/name".equals(mimeType)){
+	          Log.i(TAG, "姓名："+data1);
+	        }else if("vnd.android.cursor.item/email_v2".equals(mimeType)){
+	          Log.i(TAG, "邮箱："+data1);
+	        }
+	      }
+	      c.close();
+		    }
+	  }
+	  cursor.close();
+	} 
+}
+
+//==================写入通讯录======================
+
+public void writeContacts(){
+	//写入通讯录
+	Uri uri  = Uri.parse("content://com.android.contacts/raw_contacts");
+	Uri dataUri = Uri.parse("content://com.android.contacts/data");
+	//1.在raw_contacts表中添加一个记录
+	//取raw_contacts表中的contact_id的值
+	Cursor cursor = getContext().getContentResolver().query(uri, new String[]{"contact_id"}, null, null, "contact_id desc limit 1");
+	if(cursor !=null && cursor.moveToNext()){
+	  int contact_id = cursor.getInt(0);
+	  contact_id ++;
+	  cursor.close();
+	  
+	  ContentValues values = new ContentValues();
+	  values.put("contact_id", contact_id);
+	  getContext().getContentResolver().insert(uri, values);
+	  //2.根据上面添加记录的id，取data表中添加三条数据
+	  //存号码
+	  values = new ContentValues();
+	  values.put("mimetype", "vnd.android.cursor.item/phone_v2");
+	  values.put("data1", "10086");
+	  values.put("raw_contact_id", contact_id);
+	  getContext().getContentResolver().insert(dataUri, values);
+	  //存姓名
+	  values = new ContentValues();
+	  values.put("mimetype", "vnd.android.cursor.item/name");
+	  values.put("data1", "中国移动");
+	  values.put("raw_contact_id", contact_id);
+	  getContext().getContentResolver().insert(dataUri, values);
+	  //存邮箱
+	  values = new ContentValues();
+	  values.put("mimetype", "vnd.android.cursor.item/email_v2");
+	  values.put("data1", "10086@kengni.com");
+	  values.put("raw_contact_id", contact_id);
+	  getContext().getContentResolver().insert(dataUri, values);
+	}
+}
+
+//========================================
+
+
+
+
+
+
+
+
+
+
+//---------------------------------
+// 1.APN设置信息："content://telephony/carriers/preferapn"  (一般有设置的都是cmwap方式：cmwap 10.0.0.172:80)
+// 2.权限：<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+//===============读取APN代理(proxy,port)=========================
+
+public void readAPN(){
+	Uri PREFERRED_APN_URI = Uri.parse("content://telephony/carriers/preferapn"); //4.0以上模拟器屏蔽了该权限
+	ContentResolver resolver = getContext().getContentResolver();
+	//判断是哪个APN被选中了	
+	Cursor cursor = resolver.query(PREFERRED_APN_URI, null, null, null, null);
+	if(cursor!=null&&cursor.moveToFirst()){
+		String proxy = cursor.getString(cursor.getColumnIndex("proxy")); //代理主机
+		int port = cursor.getInt(cursor.getColumnIndex("port")); //代理端口
+		System.out.println(proxy+":"+port);
+	}
+}
+
+//========================================

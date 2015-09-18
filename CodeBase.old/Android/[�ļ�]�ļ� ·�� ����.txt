@@ -1,0 +1,101 @@
+﻿//-----------------------------------------------------------
+// 1.需修改的位置编号：L563515
+// 2.简单介绍：文件/路径/容量
+//-----------------------------------------------------------
+
+
+//--------------------------手机内存文件及其路径---------------------------------
+// 1.文件路径及其读写
+// 2.类：Context
+// 3.都是手机内存路径
+// 4.方法：	getFilesDir();  //手机内存 /data/data/包名/files
+//		getCacheDir();  //手机缓存 /data/data/包名/cache
+//		openFileOutput(“aa.txt”,mode);  //同getFilesDir(); /data/data/包名/files/aa.txt
+//		openFileInput(“aa.txt”);
+//==========================mode(权限模式)=================================
+
+文件权限：
+私有文件：Context.MODE_PRIVATE
+可读文件：Context.MODE_WORLD_READABLE
+可写文件：Context.MODE_WORLD_WRITEABLE
+可读可写文件：Context.MODE_WORLD_READABLE + Context.MODE_WORLD_WRITEABLE
+
+权限：—  ———  ———   ———
+第一位：代表文件的类型：d 文件夹; — 文件; l 挂载某一个文件
+第2-4位：代表当前用户的权限：r 可读;  w 可写;  x 可执行  (rw- 110=6 可读可写)
+第5-7位：当前用户所在组的其他组员的权限
+第8-10位：其他所有的权限：——— 没有权限; r—可读; -w- 可写; rw- 可读可写
+
+修改权限：adb shell  cd /data/data/包名/files  ls –l  chmod 666 private.txt
+
+//-------------------------案例----------------------------------
+
+File f = new File(context.getCacheDir(),"itheima.txt");
+FileOutputStream fos = new FileOutputStream(f);
+
+//===========================================================
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.对外部存储设备的方法
+// 2.对外部存储设备读写要权限
+// 3.类：Environment
+// 4.方法全静态
+// 5.方法：	getExternalStorageState();  //获得SD卡状态
+//		getExternalStorageDirectory(); //获得SD卡路径
+//		getDataDirectory();		//获取手机/data/目录(不可用)
+//=======================案例====================================
+
+String state = Environment.getExternalStorageState(); //Environment环境类
+if(!Environment.MEDIA_MOUNTED.equals(state)){  //mounted已挂载SD卡
+	//已经挂载sd卡
+	return false;
+}
+File sdCardFile = Environment.getExternalStorageDirectory();
+
+//==========================SD卡状态=================================
+
+String	MEDIA_MOUNTED		存储媒体已经挂载，并且挂载点可读/写。
+String	MEDIA_UNMOUNTED		存储媒体没有挂载。
+
+//=============================权限==============================
+
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>//SD卡写入权限
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> //SD卡读取权限
+
+//===========================================================
+
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.获取文件系统扇区，格式化大小
+// 2.类：StatFs：	检索文件系统信息
+//		构造：	StatFs(String path));  //获得磁盘状态对象
+//		方法：	getBlockSize();  	int	//获得扇区的大小
+//			getBlockCount();  	int	//获得扇区的总数
+//			getAvailableBlocks();  	int	//获得可用的扇区数量
+//	 Formatter：	格式化
+//		方法全静态：
+//			formatFileSize(Context context, long number);  String  //格式化文件大小
+//============================获取手机容量大小===============================
+
+//获取手机容量大小：
+File path = Environment.getExternalStorageDirectory();  //获得SD卡路径
+File path = Environment.getDataDirectory();  //获得手机内存路径
+StatFs stat = new StatFs(path.getPath());  //获得磁盘状态对象
+long blockSize = stat.getBlockSize();  //获得扇区的大小
+long totalBlocks = stat.getBlockCount();  //获得扇区的总数
+long availableBlocks = stat.getAvailableBlocks();  //获得可用的扇区数量
+  //格式化
+  //总空间=扇区大小*扇区总数
+  String totalMemory = Formatter.formatFileSize(this,totalBlocks * blockSize);  //总大小
+  //可用空间=扇区大小*可用扇区数
+  String availableMemory = Formatter.formatFileSize(this,availableBlocks * blockSize); //可用大小
+
+//===========================================================

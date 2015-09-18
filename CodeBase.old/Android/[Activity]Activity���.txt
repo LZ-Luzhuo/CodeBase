@@ -1,0 +1,102 @@
+﻿//-----------------------------------------------------------
+// 1.需修改的位置编号：L513156
+// 2.清单文件Activity配置
+// 3.Activity代码
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.清单文件Activity配置
+// 2.横竖屏切换：
+//		忽略：android:configChanges="orientation|keyboardHidden|screenSize"
+//		写死：android:screenOrientation="landscape"
+//			属性：landscape   横屏显示
+//			      portrait   竖屏显示
+// 3.主题： android:theme="@android:style/Theme.Translucent"
+// 4.启动模式：android:launchMode="singleInstance"
+//	属性：standard:默认标准的启动模式，每次startActivity都是创建一个新的activity的实例。
+//	   	应用：适用于绝大多数情况。
+//	      singleTop:单一顶部，如果要开启的activity在任务栈的顶部已经存在，就不会创建新的实例，而是调用onNewIntent()
+//	   	应用：浏览器书签。避免栈顶的activity被重复的创建
+//	      singletask:单一任务栈，activity只在任务栈里面存在一个实例。如果要激活的activity在任务栈里面就不会创建新的activity，而是调用onNewIntent()复用，并清空当前activity任务栈上面所有的activity。
+//		应用：浏览器activity，整个任务栈只有一个是你，节约内存和cpu的目的
+//	      singleInstance:单态 单例模式，整个手机系统里只有一个实例存在。不同的应用去打开这个activity共享、公用同一个activity。他独自在任务栈里面，且任务栈里只有他一个实例。
+//	    	应用：呼叫来电界面 InCallScreen
+//===========================================================
+
+<activity //设置忽略信息
+   android:configChanges="orientation|keyboardHidden|screenSize"
+   android:name=".MainActivity"
+   android:label="@string/app_name" >
+</activity>
+
+//===========================常用系统主题================================
+
+android:theme=”@android:style/Theme.Dialog”   将一个Activity显示为对话框模式
+android:theme=”@android:style/Theme.NoTitleBar”  不显示应用程序标题栏
+android:theme=”@android:style/Theme.NoTitleBar.Fullscreen”  不显示应用程序标题栏，并全屏
+android:theme=”@android:style/Theme.Light”  背景为白色
+android:theme=”@android:style/Theme.Light.NoTitleBar”  白色背景并无标题栏
+android:theme=”@android:style/Theme.Light.NoTitleBar.Fullscreen”  白色背景，无标题栏，全屏
+android:theme=”@android:style/Theme.Black”  背景黑色
+android:theme=”@android:style/Theme.Black.NoTitleBar”  黑色背景并无标题栏
+android:theme=”@android:style/Theme.Black.NoTitleBar.Fullscreen”    黑色背景，无标题栏，全屏
+android:theme=”@android:style/Theme.Wallpaper”  用系统桌面为应用程序背景
+android:theme=”@android:style/Theme.Wallpaper.NoTitleBar”  用系统桌面为应用程序背景，且无标题栏
+android:theme=”@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen”  用系统桌面为应用程序背景，无标题栏，全屏
+android:theme=”@android:style/Theme.Translucent” 半透明效果
+android:theme=”@android:style/Theme.Translucent.NoTitleBar”  半透明并无标题栏
+android:theme=”@android:style/Theme.Translucent.NoTitleBar.Fullscreen”  半透明效果，无标题栏，全屏
+android:theme=”@android:style/Theme.Panel”
+android:theme=”@android:style/Theme.Light.Panel”
+
+//===========================================================
+
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.Activity代码
+// 2.声明周期
+//	完整生命周期：onCreate  onStart  onResume  onPause  onStop  onDestroy
+//	可视生命周期：onStart  onResume  onPause  onStop 
+//	前台生命周期：onResume  onPause
+//
+//===========================================================
+
+public class MainActivity extends Activity {
+	@Override  //被创建的时候调用的方法
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
+	@Override  //被销毁的时候调用的方法
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+	@Override  //在onCreate之后调用，当activity界面用户可见的时候调用的方法
+	protected void onStart() {
+		super.onStart();
+	}
+	
+	@Override  //在onDestroy之前调用，当activity界面用户不可见的时候调用
+	protected void onStop() {
+		super.onStop();
+	}
+	
+	@Override  //界面开始获取到焦点对应的方法
+	protected void onResume() {
+		super.onResume();
+	}
+	
+	@Override  //界面拾取焦点对应的方法(暂停)
+	protected void onPause() {
+		super.onPause();
+	}
+}
+
+//===========================================================
+
+

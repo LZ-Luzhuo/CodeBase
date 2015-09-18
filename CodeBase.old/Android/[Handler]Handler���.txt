@@ -1,0 +1,69 @@
+//-----------------------------------------------------------
+// 1.需修改的位置编号：L613515
+// 2.消息接收、消息发送、Handler详解
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.消息接收
+//===========================================================
+
+private static final String TAG = "MainActivity";
+private Handler handler = new Handler() {
+	@Override
+	public void handleMessage(Message msg) {
+		Log.i(TAG, "what:" + msg.what);
+		Log.i(TAG, "obj:" + msg.obj);
+		super.handleMessage(msg);
+	}
+};
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.消息发送
+// 2.使用sendMessageAtTime(Message msg, long uptimeMillis)	boolean  时，uptimeMillis参数为手机时间(如：SystemClock.uptimeMillis())
+//===========================================================
+
+public void button1(View v) {
+	new Thread() {
+		@Override
+		public void run() {
+			Message msg = Message.obtain();
+			msg.what = 1;
+			msg.obj = "sendEmptyMessage(what)";
+			handler.sendEmptyMessage(1);
+				super.run();
+		}
+	}.start();
+}
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// Handler详解：
+// 注意：主线程handler，系统调用Looper
+//       子线程handler，自己调用Looper
+// handler 使用步骤
+// 1.Looper.prepare();  先调用，并且只能执行一次
+// 给threadLocal设置一个looper对象
+// 在looper的构造方法中，创建一个messageQueue对象
+//
+// 2.创建Handler,使用Handler
+// 在Handler的构造方法当中
+// 1.获得looper
+// 2.获得looper中的messageQueue
+//
+// 3.Looper.loop()
+// 依次取出messageQueue里面的message
+// 并执行message.target.dispatchMessage();其中message.target就是发送这个信息的handler
+//
+// handler.sendEmptyMessage(0);
+// 其他的操作
+// 最终将message发送到messageQueue里面
+// 在messageQueue里面，所有的message都是按时间为顺序从大到小排列
+//===========================================================

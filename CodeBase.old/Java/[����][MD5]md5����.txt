@@ -1,0 +1,62 @@
+//----------------------------MD5加密-------------------------------
+// 1.需修改的位置编号：L561321
+// 2.需要jar包(选择一个)：commons-codec.jar
+//	        	  commons-codec-1.4.jar  //多了个可以接收输入流的参数
+//	      		  commons-codec-1.7.jar  //未发现变化
+// 3.这里介绍两种常用加密：
+//			md5
+//			sha
+// 4.md5实现代码
+//--------------------------Luzhuo Writer---------------------------------
+
+
+//-----------------------------------------------------------
+// 1.md5加密
+// 2.方法全是静态的
+// 3.方法：md5Hex(String str);		String
+//	   md5Hex(byte[] data);		String
+//	   md5Hex(InputStream data); 	String  //1.4以版本
+//===========================================================
+
+ String md5 = DigestUtils.md5Hex("fasdfasdgadsfa3213132");
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.sha加密
+// 2.方法全是静态的
+// 3.方法：shaHex(String str);		String
+//	   shaHex(byte[] data);		String
+//	   shaHex(InputStream data); 	String  //1.4以版本
+//===========================================================
+
+ String sha = DigestUtils.shaHex("fasdfasdgadsfa3213132");
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.md5加密的实现代码
+//===========================================================
+
+//得到一个信息摘要器
+MessageDigest digest = MessageDigest.getInstance("md5");
+String password = "123456";
+byte[] result = digest.digest(password.getBytes());
+StringBuffer buffer = new StringBuffer();
+//把每一个byte做一个与运算 0xff
+for(byte b : result){
+	//与运算
+	int number = b & 0xff; //0xfff加盐
+	String str = Integer.toHexString(number);
+	if(str.length() ==1){
+		buffer.append("0");
+	}
+	buffer.append(str);
+}
+System.out.println(buffer.toString());
+
+//===========================================================

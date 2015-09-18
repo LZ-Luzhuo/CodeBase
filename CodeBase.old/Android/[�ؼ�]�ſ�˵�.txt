@@ -1,0 +1,298 @@
+//--------------优酷菜单-------------------
+// 1.需修改的位置编号：L131323
+// 2.参考素材在附件
+// 3.布局：1.主页布局
+// 4.MyUtils.java 处理动画
+//----------Luzhuo-write-----------
+
+
+//-------------------主页布局--------------------
+// 文件名：activity_main.xml
+//========================================
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.youkucaidan.MainActivity" >  //L131323  
+
+    <RelativeLayout
+        android:id="@+id/level1"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/level1" >  //L131323  
+
+        <ImageView
+            android:id="@+id/icon_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:background="@drawable/icon_home" />  //L131323  
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/level2"
+        android:layout_width="180dp"
+        android:layout_height="90dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/level2" >  //L131323  
+
+        <ImageView
+            android:id="@+id/icon_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/icon_search" />  //L131323  
+
+        <ImageView
+            android:id="@+id/icon_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/icon_menu" />  //L131323  
+
+        <ImageView
+            android:id="@+id/icon_myyouku"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:background="@drawable/icon_myyouku" />  //L131323  
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/level3"
+        android:layout_width="280dp"
+        android:layout_height="140dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/level3" >  //L131323  
+
+        <ImageView
+            android:id="@+id/channel1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/channel1" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/channel1"
+            android:layout_alignLeft="@id/channel1"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="25dp"
+            android:background="@drawable/channel2" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/channel2"
+            android:layout_alignLeft="@id/channel2"
+            android:layout_marginBottom="2dp"
+            android:layout_marginLeft="32dp"
+            android:background="@drawable/channel3" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/channel4" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/channel7" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/channel7"
+            android:layout_alignRight="@id/channel7"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="25dp"
+            android:background="@drawable/channel6" />  //L131323  
+
+        <ImageView
+            android:id="@+id/channel5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/channel6"
+            android:layout_alignRight="@id/channel6"
+            android:layout_marginBottom="2dp"
+            android:layout_marginRight="35dp"
+            android:background="@drawable/channel5" />  //L131323  
+    </RelativeLayout>
+
+</RelativeLayout>
+
+//========================================
+
+
+
+
+//------------------------------------------------
+// 1.文件名：MainActivity.java
+// 2.private boolean isLevel3Show 控制菜单是否显示
+//					true为显示，false为隐藏
+// 3.类要继承OnClickListener
+//		implements OnClickListener
+//=================成员变量=======================
+
+	private ImageView icon_menu;
+	private ImageView icon_home;
+	private RelativeLayout level1;
+	private RelativeLayout level2;
+	private RelativeLayout level3;
+	//第三级菜单是否显示
+	private boolean isLevel3Show = true;
+	private boolean isLevel2Show = true;
+	private boolean isLevel1Show = true;
+
+//==================主体代码======================
+
+	icon_menu = (ImageView) findViewById(R.id.icon_menu);  //L131323  菜单
+	icon_home = (ImageView) findViewById(R.id.icon_home);  //L131323  主页
+	level1 = (RelativeLayout) findViewById(R.id.level1);  //L131323  布局1
+	level2 = (RelativeLayout) findViewById(R.id.level2);  //L131323  布局2
+	level3 = (RelativeLayout) findViewById(R.id.level3);  //L131323  布局3
+	
+	icon_home.setOnClickListener(this);
+	icon_menu.setOnClickListener(this);
+
+//=================对点击事件的处理=======================
+
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.icon_menu:
+
+			//如果第3级菜单是显示状态，那么将其隐藏
+			if(isLevel3Show){
+				MyUtils.startAnimOut(level3);
+			}else{
+				//如果第3级菜单是隐藏状态，那么将其显示
+				MyUtils.startAnimIn(level3);
+			}
+			isLevel3Show = !isLevel3Show;
+			break;
+
+		case R.id.icon_home: 
+			//如果第二级菜单是显示状态，那么就隐藏2,3级菜单
+			if(isLevel2Show){
+				MyUtils.startAnimOut(level2);
+				isLevel2Show = false;
+				icon_menu.setClickable(false);
+				if(isLevel3Show){
+					//如果此时，第三级菜单也显示，那么将其隐藏
+					MyUtils.startAnimOut(level3,200);
+					isLevel3Show = false;
+					icon_menu.setClickable(false);
+				}
+			}else{
+				//如果第二级菜单是隐藏状态，那么就显示2级菜单
+				MyUtils.startAnimIn(level2);		
+				isLevel2Show = true;
+				icon_menu.setClickable(true);
+			}
+			break;
+		}
+	}
+
+//================对按键的处理========================
+
+	//响应按键的动作
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode == KeyEvent.KEYCODE_MENU){ //监听menu按键
+			changeLevel1State();
+		}
+		return super.onKeyDown(keyCode, event);
+	}
+
+//================changeLevel1State();========================
+
+	//改变第一级菜单的状态
+	private void changeLevel1State() {
+		//如果第一级菜单是显示状态，那么就隐藏1,2,3级菜单
+		if(isLevel1Show){
+			MyUtils.startAnimOut(level1);
+			isLevel1Show = false;
+			if(isLevel2Show){ //判断二级菜单是否显示
+				MyUtils.startAnimOut(level2, 100);
+				isLevel2Show = false;
+				if(isLevel3Show){ //三级菜单是否显示
+					MyUtils.startAnimOut(level3, 200);
+					isLevel3Show = false;
+				}
+			}
+			icon_menu.setClickable(false);
+			icon_home.setClickable(false);
+		}else{
+		//如果第一级菜单是隐藏状态，那么就显示1,2菜单
+			MyUtils.startAnimIn(level1);
+			isLevel1Show = true;
+			
+			MyUtils.startAnimIn(level2,200);
+			isLevel2Show = true;
+			icon_menu.setClickable(true);
+			icon_home.setClickable(true);
+		}
+	}
+
+
+//========================================
+
+
+
+
+
+
+//------------------------------------------------
+// 1.文件名：MyUtils.java
+// 2.执行动画工具类
+//========================================
+
+	public static void startAnimOut(RelativeLayout view) { //顺时针离开 0-180°
+		startAnimOut(view, 0);
+	}
+	
+	//旋转离开的动画延迟执行
+	public static void startAnimOut(RelativeLayout view, long offset) {
+		RotateAnimation animation = new RotateAnimation(0, 180, view.getWidth()/2, view.getHeight());
+		animation.setDuration(500);
+		animation.setFillAfter(true);
+		animation.setStartOffset(offset);
+		view.startAnimation(animation);
+	}
+
+	public static void startAnimIn(RelativeLayout view) { //顺时针进来 180-360°
+		startAnimIn(view, 0);
+	}
+
+	public static void startAnimIn(RelativeLayout view, long offset) {
+		RotateAnimation animation = new RotateAnimation(180, 360, view.getWidth()/2, view.getHeight());
+		animation.setDuration(500);
+		animation.setFillAfter(true);
+		animation.setStartOffset(offset);
+		view.startAnimation(animation);
+	}
+
+//========================================

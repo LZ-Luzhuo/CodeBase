@@ -1,0 +1,48 @@
+//--------------创建快捷图标-------------------
+// 1.需修改的位置编号：L652356
+// 2.注意点：1.要事先定义SharedPreferences来存储图标的状态
+//----------Luzhuo-write-----------
+
+//----------------------------------------
+// 相关权限
+//=============================copy=======================================
+
+<uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
+
+//=======================================================================
+
+
+
+//----------------------------------------
+//  1.要事先定义SharedPreferences来存储图标的状态
+// 	private SharedPreferences sp;
+//	sp = getSharedPreferences("config", MODE_PRIVATE);	//L652356 文件名为config
+//=============================copy=======================================
+
+	/**
+	 * 创建快捷图标
+	 */
+	private void installShortCut() {
+		boolean shortcut = sp.getBoolean("shortcut", false);
+		if(shortcut){
+			return;
+		}
+		Editor editor = sp.edit();
+		//发送创建快捷图标意图的广播
+		Intent intent = new Intent();
+		intent.setAction("com.android.launcher.action.INSTALL_SHORTCUT");
+		//快捷方式。要包含3个重要的信息，1.名称 2.图标 3.干什么事情
+		intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, "图标名称");	//L652356 修改图标名称
+		intent.putExtra(Intent.EXTRA_SHORTCUT_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));	//L652356 图标(资源位置)
+		//桌面点击图标对应的意图
+		Intent shortcutIntent = new Intent();
+		shortcutIntent.setAction("android.intent.action.MAIN");
+		shortcutIntent.addCategory("android.intent.category.LAUNCHER");
+		shortcutIntent.setClassName(getPackageName(), "com.example.mobilesafe.SplashActivity");		//L652356 打开配置入口的页面
+		intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+		sendBroadcast(intent);
+		editor.putBoolean("shortcut", true);
+		editor.commit();
+	}
+
+//=======================================================================

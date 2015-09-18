@@ -1,0 +1,72 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L453842
+// 2.需要c3p0连接池jar包
+// 3.配置：
+//	设置：setDriverClass("com.mysql.jdbc.Driver");
+//	xml文件配置：c3p0-config.xml  (推荐)
+//-------------------------------------------------------
+
+
+//-------------------------------------------------------
+// 1.主要语句：
+//		ComboPooledDataSource source = new ComboPooledDataSource();
+//		Connection conn = source.getConnection();
+//		conn.close();
+//=============================================================
+
+//到类加载目录下找c3p0-config.xml.xml
+ComboPooledDataSource source = new ComboPooledDataSource();
+//ComboPooledDataSource source = new ComboPooledDataSource("aaa");
+//source.setDriverClass("com.mysql.jdbc.Driver");
+//source.setJdbcUrl("jdbc:mysql:///mydb8");
+//source.setUser("root");
+//source.setPassword("root");
+
+conn = source.getConnection();
+ps = conn.prepareStatement("select * from account");
+rs = ps.executeQuery();
+while(rs.next()){
+	String name = rs.getString("name");
+	System.out.println(name);
+}
+DbUtils.closeQuietly(conn, stat, resultSet);
+
+//=============================================================
+
+
+
+
+
+//-------------------------------------------------------
+// 1.配置文件
+// 2.文件名：c3p0-config.xml
+// 3.放在类加载目录下(如src)
+// 4.其他可以配置的参数:
+//		driverClass
+//		jdbcUrl
+//		user
+//		password
+//		acquireIncrement:当连接池没有连接时，自动一次获取的连接个数
+//		initialPoolSize：连接池初始化时，获取连接的个数
+//		maxPoolSize：连接池最大的连接个数
+//		maxIdleTime：空闲多久时释放连接，0为不释放
+//		minPoolSize：连接池最小的连接数量
+//=============================c3p0-config.xml================================
+
+<?xml version="1.0" encoding="utf-8"?>
+<c3p0-config>
+	<default-config>
+		<property name="driverClass">com.mysql.jdbc.Driver</property>
+		<property name="jdbcUrl">jdbc:mysql:///mydb8</property>
+		<property name="user">root</property>
+		<property name="password">root</property>
+	</default-config>
+	<named-config name="aaa">
+		<property name="driverClass">com.mysql.jdbc.Driver</property>
+		<property name="jdbcUrl">jdbc:mysql:///mydb8</property>
+		<property name="user">root</property>
+		<property name="password">root</property>
+	</named-config>
+</c3p0-config>
+
+//=============================================================

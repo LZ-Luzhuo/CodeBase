@@ -1,0 +1,364 @@
+//-----------------------------------------------------
+// 1.需修改的位置编号：L613518
+// 2.Uri简介
+// 2.内容提供者(声明，设置权限)
+// 3.内容访问者(添加权限)
+// 4.内容观察者
+//-----------------------------------------------------
+
+
+
+//-----------------------------------------------------
+// 1.Uri简介
+// 2.content://com.itheima.provider/person/10
+//   \------/ \------------------/ \---/ \--/
+//    scheme        authority       path  ID
+//	scheme:声明一个ContentProvider控制这些数据
+//	主机名/授权(Authoryty):定义那个ContentProvider提供这些数据
+//	path路径:URI下的某个Item
+//	ID:定义Uri时使用#号占位符代替，使用时替换成对应的数字
+//	    content://com.itheima.provider/person/#  #表示数据id (#代表任意数字)
+//	    content://com.itheima.provider/person/*  *来匹配任意文本
+// 3.帮助类：UriMatcher：用于匹配Uri
+//		构造：new UriMatcher(UriMatcher.NO_MATCH); //不匹配返回的类型
+//		方法：addURI(authority,path,code); //添加uri
+//		      match(uri);  int  //匹配完整uri
+//	     ContentUris：获取和添加Uri信息
+//		方法全静态：
+//		parseId(Uri contenturi)	   long  //根据uri分析出id
+//		withAppendedId(Uri contenturi, long id);    Uri  //追加id
+//=====================================================
+
+
+
+
+
+//-----------------------------------------------------
+// 1.内容提供者(声明，设置权限)
+// 2.类继承ContentProvider --> 重写方法 --> 添加权限与声明
+// 3.重写方法：
+//	public boolean onCreate() {}  //其它应用第一次访问时被调用
+//	public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {}  //查询数据
+//	public Uri insert(Uri uri, ContentValues values) {}  //外部应用用此添加数据
+//	public int delete(Uri uri, String selection, String[] selectionArgs) {}  //外部应用用此删除数据
+//	public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {}  //外部应用用此更新数据
+//	public String getType(Uri uri) {}  //主要用于匹配数据类型，返回当前Uri所代表数据的MIME类型
+//		若操作的数据属集合类型，MIME类型字符串返回vnd.android.cursor.dir/自定义类型
+//		若操作的数据属非集合类型，MIME类型字符串返回vnd.android.cursor.item/自定义类型
+//=====================================================
+
+//内容提供者
+public class PersonContentProvider extends ContentProvider {
+	private static final String AUTHORITY = "com.example.androiddemotest1.PersonContentProvider";   //L613518  主机名
+	private static final int PRESON_INSERT_CODE = 0; //操作person表添加操作的uri匹配码
+	private static final int PRESON_DELETE_CODE = 1;
+	private static final int PRESON_UPDATE_CODE = 2;
+	private static final int PRESON_QUERY_ALL_CODE = 3;
+	private static final int PRESON_QUERY_ITEM_CODE = 4;
+	private static UriMatcher uriMatcher;
+	private PersonSQLiteOpenHelper mOpenHelper; //person数据库帮助对象
+	  
+	static{
+	  uriMatcher = new UriMatcher(UriMatcher.NO_MATCH); //不匹配返回的类型
+	  //添加一些rui(分机号)
+	  // content://com.example.androiddemotest1.PersonContentProvider/person/insert   //L613518 分机号
+	  uriMatcher.addURI(AUTHORITY,  //authority 主机名
+	      "person/insert",  //path 分机号
+	      PRESON_INSERT_CODE); //code 匹配码  //0
+	  // content://com.example.androiddemotest1.PersonContentProvider/person/delete
+	  uriMatcher.addURI(AUTHORITY, "person/delete", PRESON_DELETE_CODE); //1   		//L613518 
+	  // content://com.example.androiddemotest1.PersonContentProvider/person/update
+	  uriMatcher.addURI(AUTHORITY, "person/update", PRESON_UPDATE_CODE);  //2   		//L613518 
+	  // content://com.example.androiddemotest1.PersonContentProvider/person/queryAll
+	  uriMatcher.addURI(AUTHORITY, "person/queryAll", PRESON_QUERY_ALL_CODE);  //3   	//L613518 
+	  // content://com.example.androiddemotest1.PersonContentProvider/person/query/#
+	  uriMatcher.addURI(AUTHORITY, "person/query/#", PRESON_QUERY_ITEM_CODE);  //4   	//L613518 
+	}
+	
+	public boolean onCreate() {
+	  mOpenHelper = new PersonSQLiteOpenHelper(getContext());
+	  return true;
+	}
+
+	public Cursor query(Uri uri, String[] projection, String selection,
+	    String[] selectionArgs, String sortOrder) {
+	  SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+	  switch (uriMatcher.match(uri)) {
+	  case PRESON_QUERY_ALL_CODE:  //查询所有人的uri
+	    if(db.isOpen()){
+	      Cursor cursor = db.query("person",projection, selection,selectionArgs,null,null,sortOrder);   //L613518 
+	      return cursor;
+	      //db.close(); 返回cursor结果集时，不可以关闭数据库
+	    }
+	  case PRESON_QUERY_ITEM_CODE: //查询的是单条数据，uri末尾处有一个id
+	    if(db.isOpen()){
+	      long id = ContentUris.parseId(uri);
+	      Cursor cursor = db.query("person",projection,"_id = ?",new String[]{id+""},null,null,sortOrder);   //L613518 
+	      return cursor;
+	    }
+	    break;
+	  default:
+	    throw new IllegalArgumentException("uri不匹配："+uri);
+	  }
+	  return null;
+	 }
+
+	 public String getType(Uri uri) { //系统使用，可写可不写   //L613518 
+	   switch (uriMatcher.match(uri)) {
+	   case PRESON_QUERY_ALL_CODE: //返回多条的MIME-type
+	     return "vnd.android.cursor.dir/person";
+	   case PRESON_QUERY_ITEM_CODE: //返回单条的MIME-TYPE
+	     return "vnd.android.cursor.item/person";
+	   default:
+	     break;
+	   }
+	   return null;
+	 }
+
+	 public Uri insert(Uri uri, ContentValues values) {
+	   switch (uriMatcher.match(uri)) {
+	   case PRESON_INSERT_CODE:  //添加人到person表中
+	      SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+	      
+	      if(db.isOpen()){
+	        long id = db.insert("person", null, values);   //L613518 
+	        db.close();
+	        return ContentUris.withAppendedId(uri, id);  //追加id
+	      }
+	     break;
+	   default:
+	     throw new IllegalArgumentException("uri不匹配："+uri);
+	   }
+	   return null;
+	 }
+
+	 public int delete(Uri uri, String selection, String[] selectionArgs) {
+	   switch (uriMatcher.match(uri)) {
+	   case PRESON_DELETE_CODE: //在person表中删除数据的
+	     SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+	     if(db.isOpen()){
+	       int count = db.delete("person", selection, selectionArgs);   //L613518 
+	       db.close();
+	       return count;
+	     }
+	     break;
+	   default:
+	     throw new IllegalArgumentException("uri不匹配："+uri);
+	   }
+	   return 0;
+	 }
+
+	 public int update(Uri uri, ContentValues values, String selection,
+	     String[] selectionArgs) {
+	   switch (uriMatcher.match(uri)) {
+	   case PRESON_UPDATE_CODE: //更新person表的操作
+	     SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+	     if(db.isOpen()){
+	       int count = db.update("person", values, selection,selectionArgs);   //L613518 
+	       db.close();
+	       return count;
+	     }
+	     break;
+	   default:
+	     throw new IllegalArgumentException("uri不匹配："+uri);
+	   }
+	   return 0;
+	 }
+}
+
+//========================声明内容提供者，设置权限=============================
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.itheima.sqlitedemo"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk .../>
+
+    <permission android:name="aa.bb.cc.read" ></permission>  //声明权限，只有声明才能识别
+    <permission android:name="aa.bb.cc.write" ></permission>
+
+    <application ... >
+        <activity ... /></activity>
+
+        <provider  //声明内容提供者
+            android:name=".providers.PersonContentProvider"  //类全名
+	    android:authorities="com.itheima.sqlitedemo.providers.PersonContentProvider"//主机名(任意)
+            android:readPermission="aa.bb.cc.read"  //设置权限
+            android:writePermission="aa.bb.cc.write" >
+        </provider>
+    </application>
+</manifest>
+
+//=====================================================
+
+
+
+
+
+
+
+
+//-----------------------------------------------------
+// 1.内容访问者(添加权限)
+// 2.主要语句：
+//		 Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/insert");
+//		 ContentResolver resolver = getContext().getContentResolver();  //内容提供者对象
+//		 uri = resolver.insert(uri, values);  //执行
+//=====================================================
+
+public class TestCase extends AndroidTestCase {
+	private static final String TAG = "TestCase";
+
+	public void textInsert(){
+	    Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/insert");
+	    ContentResolver resolver = getContext().getContentResolver();  //内容提供者对象
+	    
+	    ContentValues values = new ContentValues();
+	    values.put("name", "lwangwu");
+	    values.put("age", 63);
+	    
+	    uri = resolver.insert(uri, values);  //执行
+	    long id = ContentUris.parseId(uri);  //分析出id
+	    Log.i(TAG, "添加到："+id);
+	}
+	  
+	public void testDelete(){
+	    Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/delete");
+	    ContentResolver resolver = getContext().getContentResolver();
+	    String where = "_id = ?";
+	    String[] selectionArgs = {"3"};
+	    int count = resolver.delete(uri, where, selectionArgs);
+	    Log.i(TAG, "删除行："+count);
+	}
+	  
+	public void testUpdate(){
+	    Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/update");
+	    ContentResolver resolver = getContext().getContentResolver();
+	    ContentValues values = new ContentValues();
+	    values.put("name", "lisi");
+	    int count = resolver.update(uri, values, "_id = ?", new String[]{"5"});
+	    Log.i(TAG, "更新行"+count);
+	}
+	  
+	public void testQueryAll(){
+	    Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/queryAll");
+	    ContentResolver resolver = getContext().getContentResolver();
+	    Cursor cursor = resolver.query(uri, new String[]{"_id","name","age"}, null, null, "_id desc");
+	    if(cursor != null && cursor.getCount()>0){
+	      int id;
+	      String name;
+	      int age;
+	      while(cursor.moveToNext()){
+	        id = cursor.getInt(0);
+	        name = cursor.getString(1);
+	        age = cursor.getInt(2);
+	        Log.i(TAG, "id:"+id+",name:"+name+",age:"+age);
+	      }
+	      cursor.close();
+	    }
+	}
+	  
+	public void testQuerySingleItem(){
+	    Uri uri = Uri.parse("content://com.example.androiddemotest1.PersonContentProvider/person/query/#");
+	    //在uri的末尾添加一个id content://com.example.androiddemotest1.PersonContentProvider/person/query/20
+	    uri = ContentUris.withAppendedId(uri, 5);
+	    //内容提供者访问对象
+	    ContentResolver resolver = getContext().getContentResolver();
+	    Cursor cursor = resolver.query(uri, new String[]{"_id","name","age"}, null, null, null);
+	    if(cursor != null && cursor.moveToFirst()){
+	      int id = cursor.getInt(0);
+	      String name = cursor.getString(1);
+	      int age = cursor.getInt(2);
+	      cursor.close();
+	      Log.i(TAG, "id:"+id+",name:"+name+",age:"+age);
+	    }
+	}
+}
+
+//========================添加权限=============================
+
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.itheima.othercontentprovider"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk ... />
+    <uses-permission android:name="aa.bb.cc.read"/>  //添加访问权限
+    <uses-permission android:name="aa.bb.cc.write"/>
+    <application ... /></application>
+
+</manifest>
+
+//=====================================================
+
+
+
+
+
+
+
+//-----------------------------------------------------
+// 1.内容观察者
+// 2.注册内容观察者主要代码：(一般只使用这个)
+//	Uri uri = Uri.parse("content://com.itheima.sqlitedemo.providers.PersonContentProvider");
+//	getContentResolver().registerContentObserver(uri, true, new ContentObserver(new Handler()) {
+//		public void onChange(boolean selfChange) { }
+//	});
+// 3.通知内容观察者主要代码：(一般系统通知，我们只注册观察变化)
+//	getContext().getContentResolver().notifyChange(Uri.parse("content://com.itheima.sqlitedemo.providers.PersonContentProvider"), null);
+// 4.注册的内容观察者uri 与 通知内容观察者uri 要相同
+// 5.无需任何配置
+//======================注册内容观察者===============================
+
+//MainActivity.java  //内容观察者数据库操作
+public class MainActivity extends ActionBarActivity {
+  protected static final String TAG = "MainActivity";
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    
+    //注册观察者观察数据库改变
+    Uri uri = Uri.parse("content://com.itheima.sqlitedemo.providers.PersonContentProvider");   	//L613518
+    getContentResolver().registerContentObserver(uri, true, new ContentObserver(new Handler()) {
+      @Override
+      public void onChange(boolean selfChange) {
+        Log.i(TAG, "内容改变了");
+      }
+    });
+  }
+
+//=====================通知内容观察者================================
+
+//PersonContentProvider.java
+public class PersonContentProvider extends ContentProvider {
+	... ...
+  }
+... ... ...
+  @Override
+  public Uri insert(Uri uri, ContentValues values) {
+    switch (uriMatcher.match(uri)) {
+    case PRESON_INSERT_CODE: // 添加人到person表中
+      SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+      if (db.isOpen()) {
+        long id = db.insert("person", null, values);
+
+        //通知内容观察者改变
+        getContext().getContentResolver().notifyChange(Uri.parse("content://com.itheima.sqlitedemo.providers.PersonContentProvider"), null);   //L613518
+
+        db.close();
+        return ContentUris.withAppendedId(uri, id); // 追加id
+      }
+      break;
+    default:
+      throw new IllegalArgumentException("uri不匹配：" + uri);
+    }
+    return null;
+  }
+... ... ...
+
+//=====================================================

@@ -1,0 +1,56 @@
+﻿//-----------------------------------------------------------
+// 1.需修改的位置编号：L156153
+// 2.广播接收者：四大组件之一 (不管应用是否开启，有广播自动开启)
+// 3.发送广播、广播接收
+// 4.广播优先级：(清单配置文件：priority属性设置优先级)
+//	  无序广播：所有的接收者都会接收事件，不可以被拦截，不可以修改
+//	  有序广播：按照优先级一级一级的向下传递，高优先级的接收者可修改/终止广播
+//
+//	  同优先级：同文件：谁在清单文件的前面谁优先级高
+//		     程序：谁先安装优先级高
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.发送广播：(无需配置清单文件)
+//	sendBroadcast(intent); //发送无序广播
+//	sendOrderedBroadcase(intent, receiverPermission); //发送有序广播
+//	sendOrderedBroadcase(intent, receiverPermission, resultReceiver, scheduler, initialCode, initialData, initialExtras);  //发送有序广播
+//			      意图     接收者权限null	 最终发给谁newXXX   null    出自哪0      数据”X”     额外数据null
+//===========================================================
+
+public void click(View v){
+	Intent intent = new Intent();
+	intent.setAction("com.itheima.sender.haha");  //自定义一个广播动作
+	sendBroadcast(intent); //发送无序广播
+}
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.广播接收者
+// 2.写一个类继承广播接收者 --> 在清单文件配置关心的动作 --> 一旦广播事件发生就会执行onReceive()方法
+//===========================================================
+
+public class ReceiverDemo extends BroadcastReceiver {
+	//当接收到消息调用的方法
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		System.out.println("收到广播");     //L156153
+	}
+}
+
+//=========================清单文件配置==================================
+
+//广播接收者清单配置
+<receiver android:name="com.itheima.police.PoliceReciver">
+  <intent-filter android:priority="1000">  //优先级 -1000到1000
+     <action android:name="com.itheima.sender.haha" />     //L156153
+  </intent-filter>
+</receiver>
+
+//===========================================================
+
+

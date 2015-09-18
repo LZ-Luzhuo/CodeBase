@@ -1,0 +1,414 @@
+﻿//----------------------------------------------------------
+// 1.需修改的位置编号：L135155
+// 2.类继承Service --> 清单文件添加service声明
+// 3.开启方式：
+//	start开启：
+//	绑定开启：
+//		绑定本地服务调用
+//		绑定远程服务调用
+//		混合调用
+// 4.service运行与主线程中，服务中另开子线程做耗时操作
+//-----------------------------------------------------------
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.start开启：
+// 2.生命周期：onCreate() --> onStartCommand() --> onDestory()
+// 3.如果服务已经开启，不会重复执行onCreate，而是调用onStart()/onStartCommand(),服务停止调用onDestory(),服务只会被停止一次
+// 	 一旦服务开启跟调用者就没有任何关系了(开启者退出/挂了，服务还在后台运行)
+//  	开启者没有办法调用服务里面的方法
+//==========================开启=================================
+
+public void click(View v){
+	Intent intent = new Intent(this,MyService.class);
+	startService(intent);
+}
+
+//==========================服务=================================
+
+public class MyService extends Service {
+  @Override
+  public void onCreate() {
+    System.out.println("onCreate服务创建了");
+    super.onCreate();
+  }
+  @Override
+  public int onStartCommand(Intent intent, int flags, int startId) {
+    System.out.println("onStartCommand服务接受到了开启指令");
+    return super.onStartCommand(intent, flags, startId);
+  }
+  @Override
+  public void onDestroy() {
+    System.out.println("onDestroy服务销毁了");
+    super.onDestroy();
+  }
+}
+
+//==========================清单文件声明=================================
+
+<service android:name="com.itheima.testservice.MyService" />
+
+//===========================================================
+
+
+
+
+
+
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.绑定开启：
+//	  绑定本地服务调用：
+//	  绑定远程服务调用：
+/	  混合调用：
+// 2.生命周期：onCreate()  onBind()  onunbind()  onDestory()
+// 	 绑定服务不会调用onStart()/onStartCommand()方法
+//	 调用者挂了，服务也会跟着挂掉
+// 	 开启者可以调用服务里面的方法
+//
+//===========================================================
+//-----------------------------------------------------------
+// 1.绑定本地服务调用
+//  绑定本地服务调用：调用者和服务在同一个工程代码里面
+//    1.在服务的内部创建一个内部类继承Binder，提供一个方法，可以间接调用服务的方法
+//    2.实现服务的onbind方法，返回的就是中间人MiddlePerson
+//    3.在activity绑定服务。bindService();
+//    4.在服务成功绑定的时候，会执行一个方法onServiceConnected传递过来一个IBinder对象
+//    5.强制类型转换，调用接口里面的方法
+//=======================MainActivity .java====================================
+
+public class MainActivity extends ActionBarActivity {
+  private MyConn conn;
+  private IMiddlePerson mp;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+  }
+
+  public void bind(View v){
+    //3.activity采用绑定的方式去开启服务
+    Intent intent = new Intent(this,MyService.class);
+    conn = new MyConn();
+    bindService(intent, conn, BIND_AUTO_CREATE); //若服务不存在，自动创建
+  }
+
+  public void unbind(View v){
+    unbindService(conn); //解绑
+  }
+
+  //调用服务里的方法,不可以自己new服务调其方法，必须通过框架得到服务的引用
+  public void call(View v){
+    //5.通过中间人调用服务里面的方法
+    mp.callMethodInService(55);
+  }
+
+  private class MyConn implements ServiceConnection{
+    //4.当服务被连接的时候调用 服务被成功绑定时调用
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      //在activity里成功得到中间人
+      mp = (IMiddlePerson) service;
+    }
+    //当服务失去连接的时候调用(进程挂了，或异常挂了)
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+    }
+  }
+}
+
+//=========================MyService.java==================================
+
+public class MyService extends Service {
+  //2.实现服务成功绑定的代码，返回一个中间人
+  @Override
+  public IBinder onBind(Intent intent) {
+    System.out.println("onBind 服务被成功的绑定了");
+    return new MiddlePerson();
+  }
+  @Override
+  public boolean onUnbind(Intent intent) {
+    System.out.println("onUnbind");
+    return super.onUnbind(intent);
+  }
+  @Override
+  public void onCreate() {
+    System.out.println("onCreate");
+    super.onCreate();
+  }
+  @Override
+  public void onDestroy() {
+    System.out.println("onDestroy");
+    super.onDestroy();
+  }
+  /**
+   * 这是服务里的方法
+   */
+  public void methodInService(){
+    Toast.makeText(this, "我是服务里的方法", 0).show();
+  }
+  //1.第一步。服务要暴露方法必须要有中间人
+  private class MiddlePerson extends Binder implements IMiddlePerson{
+    public void callMethodInService(int money){
+      if(money>=50){
+        methodInService();
+      }else{
+        Toast.makeText(getApplicationContext(), "aaa", 0).show();
+      }
+    }
+    public void playMajiang(){
+      System.out.println("打麻将");
+    }
+  }
+}
+
+//=========================IMiddlePerson.java==================================
+
+//中间人的接口定义
+public interface IMiddlePerson {
+	public void callMethodInService(int money);
+}
+
+//===========================================================
+
+<service android:name="com.itheima.servicelife.MyService" />
+
+//===========================================================
+
+
+//-----------------------------------------------------------
+// 2.绑定远程服务调用：
+//  调用者和服务在不同的工程代码里面(调用者要创建aidl文件相同包名，复制类名和内容保持一致)
+//    1.在服务的内部创建一个内部类继承IPC的子类，提供一个方法，可以间接调用服务的方法(与服务同包)
+//    2.把暴露的接口文件的扩展名改为aidl文件，去掉所有的权限修饰符
+//    3.实现服务的onbind方法，返回的就是中间IMIddlePerson
+//    4.在activity绑定服务。bindService()
+//    5.在服务成功绑定的时候会执行一个方法onServiceConnected传递过来一个IBinder对象
+//    6.在IMiddlePerson.Stub.asInterface(binder)调用接口里面的方法
+//========================MainActivity.java===================================
+
+public class MainActivity extends ActionBarActivity {
+  private MyConn conn;
+  private IMiddlePerson iMp;
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+  }
+  public void bind(View v){
+    Intent intent = new Intent();
+    intent.setAction("com.itheima.remoteservice");
+    conn = new MyConn();
+    bindService(intent, conn, BIND_AUTO_CREATE);
+  }
+  private class MyConn implements ServiceConnection{
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+      iMp = IMiddlePerson.Stub.asInterface(service);
+    }
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+    }
+  }
+  public void call(View v){
+    try {
+      iMp.callMethodInService();
+    } catch (RemoteException e) {
+      e.printStackTrace();
+    }
+  }
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    unbindService(conn);
+  }
+}
+
+//===========================================================
+
+public class RemoteService extends Service {
+  @Override
+  public IBinder onBind(Intent intent) {
+    System.out.println("IBinder");
+    return new MiddlePerson(); 
+  }
+  @Override
+  public void onCreate() {
+    System.out.println("onCreate");
+    super.onCreate();
+  }
+  @Override
+  public void onDestroy() {
+    System.out.println("onDestroy");
+    super.onDestroy();
+  }
+  public void methodInService(){
+    System.out.println("我是远程服务的方法");
+  }
+  //1.创建一个中间人 远程服务继承的是ipc的一个实现类
+  private class MiddlePerson extends IMiddlePerson.Stub{
+    @Override
+    public void callMethodInService() {
+      methodInService();
+    }
+  }
+}
+
+//=========================IMiddlePerson.aidl==================================
+
+package com.itheima.remoteservice;
+ interface IMiddlePerson {
+void callMethodInService();
+}
+
+//===========================================================
+
+<service android:name="com.itheima.remoteservice.RemoteService">
+<intent-filter >
+    <action android:name="com.itheima.remoteservice"/>  //让别人调用
+</intent-filter>
+</service>
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 3.混合调用：
+//  混合调用：服务长期后台运行，又想调用服务的方法
+//    1.start方式开启服务(保证服务长期后台运行)
+//    2.bind方式绑定服务(保证调用服务的方法)
+//    3.unbind解除绑定服务
+//    4.stopService停止服务
+//===========================MainActivity.java================================
+
+public class MainActivity extends Activity {
+	private ISafePay iSafePay;
+	private MyConn conn;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+	}
+
+	public void bind(View v) {
+		Intent intent = new Intent();
+		intent.setAction("com.itheima.alipay");
+		conn = new MyConn();
+		bindService(intent, conn, BIND_AUTO_CREATE); // 异步的操作
+	}
+
+	private class MyConn implements ServiceConnection {
+		@Override
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			iSafePay = ISafePay.Stub.asInterface(service);
+		}
+
+		@Override
+		public void onServiceDisconnected(ComponentName name) {
+			// TODO Auto-generated method stub
+		}
+	}
+
+	public void unbind(View v) {
+		unbindService(conn);
+	}
+
+	public void method(View v) {
+		// 绑定服务调用服务里的方法
+		try {
+			boolean result = iSafePay.callpay(System.currentTimeMillis(),
+					"123", 3.52f);
+			if (result) {
+				Toast.makeText(getApplicationContext(), "支付成功", 0).show();
+			} else {
+				Toast.makeText(getApplicationContext(), "支付失败", 0).show();
+			}
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void start(View v) {
+		Intent intent = new Intent();
+		intent.setAction("com.itheima.alipay");
+		startService(intent);
+	}
+
+	public void stop(View v) {
+		Intent intent = new Intent();
+		intent.setAction("com.itheima.alipay");
+		stopService(intent);
+	}
+}
+
+//==========================SafePayService.java=================================
+
+public class SafePayService extends Service {
+	public IBinder onBind(Intent intent) {
+		System.out.println("onBind");
+		return new MyBinder();
+	}
+
+	private boolean pay(long tiem, String pwd, double money) {
+		if ("123".equals(pwd)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private class MyBinder extends ISafePay.Stub {
+		public boolean callpay(long tiem, String pwd, double money)
+				throws RemoteException {
+			return pay(tiem, pwd, money);
+		}
+	}
+
+	public void onCreate() {
+		System.out.println("onCreate");
+		super.onCreate();
+	}
+
+	public void onDestroy() {
+		System.out.println("onDestroy");
+		super.onDestroy();
+	}
+
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		System.out.println("onStartCommand");
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	public boolean onUnbind(Intent intent) {
+		System.out.println("onUnbind");
+		return super.onUnbind(intent);
+	}
+}
+
+//========================ISafePay.aidl===================================
+
+package com.example.testdemo1;
+
+interface ISafePay {
+	boolean callpay(long tiem, String pwd, double money);
+}
+
+//==========================配置文件=================================
+
+<service android:name="com.example.testdemo1.SafePayService">
+	<intent-filter >
+		<action android:name="com.itheima.alipay"/>
+	</intent-filter>
+</service>
+
+//===========================================================

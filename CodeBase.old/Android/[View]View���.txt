@@ -1,0 +1,54 @@
+﻿//-----------------------------------------------------------
+// 1.
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.XML布局属性
+//===========================================================
+
+android:background	setBackgroundResource(int) 	设置背景色/图片。"@drowable/delete"  透明："@android:color/transparent"和"@null"。
+android:clickable	setClickable(boolean) 		是否响应点击事件。true/false
+android:id		setId(int) 			给View设置唯一编号,通过调用View.findViewById()或Activity.findViewById()查找到对应的View,如"@+id/btnName"
+android:onClick						点击时从上下文中调用指定的方法。格式:android:onClick="onClickButton"  方法:public void onClickButton(View view)
+android:padding		setPadding(int,int,int,int) 	上下左右的边距,如:10dip
+android:paddingTop	setPadding(int,int,int,int) 	上方的边距
+android:paddingBottom	setPadding(int,int,int,int) 	底部的边距
+android:paddingLeft	setPadding(int,int,int,int) 	左边的边距
+android:paddingRight	setPadding(int,int,int,int) 	右边的边距
+android:visibility	setVisibility(int) 		是否显示View。值:visible(默认,显示),invisible(不显示,占空间),gone(隐藏,不占空间)
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.
+//===========================================================
+
+
+//===========================================================
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.
+//===========================================================
+
+
+
+//===========================================================
+
+
+
+//===========================================================
+
+
+
+//===========================================================
+
+
+
+//===========================================================

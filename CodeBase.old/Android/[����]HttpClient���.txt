@@ -1,0 +1,100 @@
+//-----------------------------------------------------
+// 1.需修改的位置编号：L651313
+// 2.Get
+// 3.Post
+// 4.流程：HttpClient --> execute(Get/Post) --> HttpResponse
+//	   {ConnectonManager			{StatusLine,HttpEntity
+// 5.权限：
+//	<uses-permission android:name="android.permission.INTERNET"/>
+//-----------------------------------------------------
+
+
+
+//-----------------------------------------------------
+// 1.Get请求
+//=====================================================
+
+HttpClient client = null;
+try {
+  //1.定义一个客户端
+  client = new DefaultHttpClient();
+  
+  //定义一个get请求方法
+  String data = "?username="+userName+"&password="+password;
+  HttpGet get = new HttpGet("http://192.168.0.103/ServerItheima/servlet/LoginServlet"+data);
+  
+  //设置请求头
+  //get.addHeader("Content-Length", "20");
+  
+  //response服务器响应对象，其中包含了状态信息和服务器返回的数据
+  HttpResponse response = client.execute(get); //开始执行get方法，请求网络
+  
+  int statusCode = response.getStatusLine().getStatusCode(); //状态行中获得状态码
+  if(statusCode == 200){
+    InputStream is = response.getEntity().getContent(); //响应对象返回实体，实体获得实体流
+    String text = getStringFromInputStream(is);
+    return text;
+  }else{
+    Log.i(TAG, "请求失败："+statusCode);
+  }
+} catch (Exception e) {
+  e.printStackTrace();
+}finally{
+  if(client != null){
+    client.getConnectionManager().shutdown();    //获得连接管理者，关闭连接释放资源
+  }
+}
+return null;
+
+
+//=====================================================
+
+
+
+
+
+//-----------------------------------------------------
+// 1.Post请求
+//=====================================================
+
+HttpClient client = null;
+try {
+//1.定义一个客户端
+client = new DefaultHttpClient();
+
+//定义post方法
+HttpPost post = new HttpPost("http://192.168.0.103/ServerItheima/servlet/LoginServlet");
+
+List<NameValuePair> parameters = new ArrayList<NameValuePair>();
+parameters.add(new BasicNameValuePair("username", userName));
+parameters.add(new BasicNameValuePair("password", password));
+
+//把post请求的参数包装了一层
+//不写编码名称服务器收数据时乱码，需要制定字符集为utf-8
+UrlEncodedFormEntity entity = new UrlEncodedFormEntity(parameters,"utf-8"); 
+//设置参数
+post.setEntity(entity);
+//设置请求头消息
+//post.addHeader("Content-Length", "20");  //设置请求头
+//使用客户端执行post方法
+HttpResponse response = client.execute(post); //开始执行post请求，会返回给我们一个HttpResponse对象
+//使用响应对象，获得状态码，处理内容
+int statusCode = response.getStatusLine().getStatusCode(); //获得状态吗
+if(statusCode == 200){
+  //获得响应对象，获得实体输入流
+  InputStream is = response.getEntity().getContent(); //响应对象返回实体，实体获得实体流
+  String text = getStringFromInputStream(is);
+  return text;
+}else{
+  Log.i(TAG, "请求失败："+statusCode);
+}
+} catch (Exception e) {
+  e.printStackTrace();
+}finally{
+if(client != null){
+    client.getConnectionManager().shutdown(); //关闭连接和释放资源
+  }
+}
+return null;
+
+//=====================================================

@@ -1,0 +1,141 @@
+﻿//---------------------------------
+// 1.需修改的位置编号：L513135
+// 2.使用步骤: 继承SQLiteOpenHelper --> 初始化参数 super(Context context, String name, SQLiteDatabase.CursorFactory faction, int version) --> 重写方法 --> ...
+//							  上下文	  数据库文件名		游标工厂(null)		     版本(1开始)
+// 3.主要的类：	SQLiteOpenHelper:数据库帮助类
+		SQLiteDatabase:数据库对象
+			ContenValues：
+		Cursor:结果集
+//----------Luzhuo-write-----------
+
+
+//----------------------------------
+// 1.cmd使用
+//----------------------------------
+cmd  shell  cd /data/...
+sqlite3 itheima.db  打开数据库
+.table  所有表
+.mode column  改变输出模式
+.exit  退出
+
+.select * from person; 可用sql语句
+//----------------------------------
+
+
+//---------------------------------
+// 1.继承SQLiteOpenHelper --> 初始化参数 super(Context context, String name, SQLiteDatabase.CursorFactory faction, int version) --> 重写方法 --> ...
+//					          上下文	  数据库文件名		游标工厂(null)		    版本(1开始)
+// 2.android.database.sqlite包
+//========================================
+
+public class DBHelper extends SQLiteOpenHelper {
+
+	private static final String NAME = "ithm.db";   //L513135
+	private static final int START_VERSION = 1;   //L513135
+	private static final int HISTORY_VERSION = 2;   //L513135
+	private static final int CURRENT_VERSION = 3;   //L513135
+	
+	// 新闻表：主键+标题+摘要
+	
+	public static final String TABLE_ID = "_id";  //主键都用它代替
+	public static final String TABLE_NEWS_NAME = "news";  //新闻表明   //L513135
+	public static final String TABLE_NEWS_TITLE = "title";  //新闻标题   //L513135
+	public static final String TABLE_NEWS_SUMMARY = "summay";  //新闻摘要   //L513135
+	
+
+	public DBHelper(Context context) {
+		super(context, NAME, null, START_VERSION);
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// 建表
+		db.execSQL("CREATE TABLE "+TABLE_NEWS_NAME+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");   //L513135
+		onUpgrade(db, START_VERSION, CURRENT_VERSION);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		switch (oldVersion) {
+		case START_VERSION:
+			db.execSQL("CREATE TABLE "+"bool"+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");   //L513135
+		case HISTORY_VERSION:
+			db.execSQL("CREATE TABLE "+"class"+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");   //L513135
+		case 3:
+			// 更新表
+		case 4:
+			// 删除表
+			break;
+		}
+	}
+}
+
+//========================================
+
+
+
+
+
+//---------------------------------
+// 2.数据库操作
+//========================================
+
+public class DBTest extends AndroidTestCase {
+	public void test(){
+		DBHelper dbhelper = new DBHelper(getContext());
+		
+		SQLiteDatabase writableDatabase = dbhelper.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(DBHelper.TABLE_NEWS_TITLE, "xinwen");
+		long id = writableDatabase.insert(DBHelper.TABLE_NEWS_NAME, null, values);
+		writableDatabase.close();
+		
+		SQLiteDatabase readableDatabase = dbhelper.getReadableDatabase();
+		Cursor cursor = readableDatabase.query("news", new String[]{"id","title"}, null, null, null, null, null);
+		while(cursor!=null && cursor.moveToNext()){
+			int ID = cursor.getInt(0);
+			String title = cursor.getString(1);
+			System.out.println(ID+":"+title);
+		}
+		cursor.close();
+		readableDatabase.close();
+	}
+
+//========================================
+
+
+
+
+
+//---------------------------------
+// 3.事务管理的操作
+// 4.基本格式：
+		try{
+			db.beginTransaction();  //开启事务
+			... ...
+			db.setTransactionSuccessful();  //标记事务成功
+		}finally{
+     			db.endTransaction();  //停止事务
+   		}
+//========================================
+
+public void testTransaction(){  。。。
+  if(db.isOpen()){
+    try{
+      db.beginTransaction();  //开启事务
+      //1.从张三账户中扣1000块钱
+      db.execSQL("update person set balance = balance - 1000 where name = 'zhangsan';");
+      //ATM挂掉了
+       //int result = 10/0;
+      //2.向李四账户中加1000块钱
+      db.execSQL("update person set balance = balance + 1000 where name = 'lisi';");
+      db.setTransactionSuccessful();  //标记事务成功
+    }finally{
+      db.endTransaction();  //停止事务
+    }
+    db.close();
+  }
+}
+
+//========================================
+

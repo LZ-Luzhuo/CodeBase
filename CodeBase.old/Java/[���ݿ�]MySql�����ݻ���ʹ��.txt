@@ -1,0 +1,78 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L654363
+// 2.需要MySql驱动jar包
+// 3.需要文件大小的地方需要强转成int类型:
+//					(int)file.length
+// 4.这里介绍两个类型：text,blob
+// 5.	Text:TINYTEXT(255)  TEXT(64K)  MEDIUMTEXT(16M)  LONGTEXT(4G)
+//	Bolb:TINYBLOB        BLOB       MEDIUMBLOB        LONGBLOB
+//-------------------------------------------------------
+
+
+//-------------------------------------------------------
+// 1.Text类型大数据(character)
+//=============================================================
+
+//Text大数据 添加
+conn = JDBCUtils.getConn();
+ps = conn.prepareStatement("insert into dashuju values (null,?,?)");
+ps.setString(1, "我是text大数据.txt");
+File file = new File("1.txt");
+ps.setCharacterStream(2, new FileReader(file),(int)file.length());
+ps.executeUpdate();
+
+//Text大数据 获取
+conn = JDBCUtils.getConn();
+ps = conn.prepareStatement("select * from dashuju where id=?");
+ps.setInt(1, 1);
+rs = ps.executeQuery();
+while(rs.next()){
+	String filename = rs.getString("name");
+	Reader reader = rs.getCharacterStream("content");
+	Writer writer = new FileWriter(filename);
+	char[] cs = new char[1024];
+	int i = 0;
+while((i=reader.read(cs))!=-1){
+		writer.write(cs,0,i);
+	}
+	reader.close();
+	writer.close();
+}
+
+
+//=============================================================
+
+
+
+
+
+//-------------------------------------------------------
+// 1.Blob类型大数据(binary)
+//=============================================================
+
+//blob大数据 添加
+conn = JDBCUtils.getConn();
+ps = conn.prepareStatement("insert into blobdemo values(null,?,?)");
+ps.setString(1, "我是美女哦.jpg");
+File file = new File("1.jpg");
+ps.setBinaryStream(2, new FileInputStream(file),(int)file.length());
+ps.executeUpdate();
+
+//blob大数据 获取
+conn = JDBCUtils.getConn();
+ps = conn.prepareStatement("select * from blobdemo");
+rs = ps.executeQuery();
+while(rs.next()){
+	String name = rs.getString("name");
+	InputStream in = rs.getBinaryStream("content");
+	OutputStream out = new FileOutputStream(name);
+	byte[] bs = new byte[1024];
+	int i = 0;
+	while((i=in.read(bs))!=-1){
+		out.write(bs,0,i);
+	}
+	in.close();
+	out.close();
+}
+
+//=============================================================

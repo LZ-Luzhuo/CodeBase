@@ -1,0 +1,127 @@
+//------------------------网络传输文件-----------------------------
+// 1.代码分为传输文本，和传输文件
+// 2.都有客户端和服务端
+// 3.该代码不保证能直接使用
+//-------------------------Luzhuo Writer----------------------------
+
+//========================传输文本客户端===============================
+
+public class ClientDemo_02 {
+	public static void main(String[] args) throws IOException{
+		//网络传输文本文件
+		Socket s = new Socket("192.168.0.102",10086);
+		//读取文件
+		BufferedReader br = new BufferedReader(new FileReader("a.txt"));
+		//包装通道内的输出流
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+
+		String line = null;
+		while((line=br.readLine())!=null){
+			bw.write(line);
+			bw.newLine();
+			bw.flush();
+		}
+		s.shutdownOutput(); //禁用输出流
+		BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		String data = reader.readLine();
+		System.out.println("服务器反馈："+data);
+		
+		br.close();
+		s.close();
+	}
+}
+
+//========================传输文本服务端===============================
+
+public class ServerDemo_02 {
+	public static void main(String[] args) throws IOException{
+		ServerSocket ss = new ServerSocket(10086);
+		Socket s = ss.accept();
+		//包装通道内的输入流
+		BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		//把数据写到文件
+		BufferedWriter bw = new BufferedWriter(new FileWriter("Copy.txt"));
+		
+		String line = null;
+		while((line=br.readLine())!=null){
+			bw.write(line);
+			bw.newLine();
+			bw.flush();
+		}
+		//给客户端一个反馈
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+		writer.write("OK");
+		writer.newLine();
+		writer.flush();
+		
+		bw.close();
+		s.close();
+		ss.close();
+	}
+}
+
+//=======================================================
+
+
+
+
+
+
+
+
+//=======================传输文件客户端================================
+
+public class ClientDemo_03 {
+	public static void main(String[] args) throws IOException{
+		//网络传输图片
+		Socket s = new Socket("192.168.0.102",10086);
+		//读取图片
+		InputStream is = new FileInputStream("a.bmp");
+		//写到通道
+		OutputStream os = s.getOutputStream();
+		
+		int by = 0;
+		while((by=is.read())!=-1){
+			os.write(by);
+		}
+		s.shutdownOutput();
+		
+		//获取服务器反馈
+		BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+		String data = reader.readLine();
+		System.out.println("服务器反馈："+data);
+		
+		is.close();
+		s.close();
+	}
+}
+
+//=======================传输文件服务端================================
+
+public class ServerDemo_03 {
+	public static void main(String[] args) throws IOException{
+		ServerSocket ss = new ServerSocket(10086);
+		Socket s = ss.accept();
+		//获取输入流
+		InputStream is = s.getInputStream();
+		//获取输出流
+		OutputStream os = new FileOutputStream("Copy.txt");
+		
+		int by=0;
+		while((by=is.read())!=-1){
+			os.write(by);
+		}
+		
+		//给出反馈
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream()));
+		writer.write("OK");
+		writer.newLine();
+		writer.flush();
+		
+		os.close();
+		s.close();
+		ss.close();
+	}
+}
+
+//=======================================================

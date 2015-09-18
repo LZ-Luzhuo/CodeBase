@@ -1,0 +1,194 @@
+//--------------下拉菜单-------------------
+// 1.需修改的位置编号：L613562
+// 2.参考素材在附件
+// 3.布局：1.主页布局
+//	   2.条目布局
+//----------Luzhuo-write-----------
+
+
+//-------------------主页布局--------------------
+// 文件名：activity_main.xml
+// 一个输入框，一个下拉箭头图片，点击下拉箭头弹出PopupWindow
+//========================================
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.xialacaidan.MainActivity" >  //L613562
+
+    <EditText
+        android:id="@+id/input"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:hint="请输入号码" />  //L613562 第一次显示的内容
+
+    <ImageView
+        android:id="@+id/down_arrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@id/input"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/down_arrow" />  //L613562  下拉箭头图片
+
+</RelativeLayout>
+
+//========================================
+
+//-------------------标签布局--------------------
+// 文件名：list_item.xml
+// 这是一个标签
+// 左边图片 中间内容 右边删除动作的图片
+//========================================
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    tools:context="com.example.xialacaidan.MainActivity" >  //L613562
+
+    <ImageView
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/user" />  //L613562 左边图片
+
+    <TextView
+        android:id="@+id/list_item"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="@string/hello_world" />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/delete"  //L613562 右边删除图片
+        android:clickable="true" />
+
+</LinearLayout>
+
+//========================================
+
+
+
+
+
+//---------------------------------------
+// 成员变量
+//========================================
+
+	private EditText input;
+	private ImageView down_arrow;
+	
+	private List<String> msgList;
+	private PopupWindow popWin;
+	private ListView listView;
+
+//================主体方法========================
+
+	input = (EditText) findViewById(R.id.input);  //L613562 获得输入框对象
+	down_arrow = (ImageView) findViewById(R.id.down_arrow);  //L613562 获得下拉箭头对象
+	
+	msgList = new ArrayList<String>(); 	 //L613562 需要List<String>集合来存放要显示的内容
+		for (int i = 0; i < 20; i++) {   //L613562
+		msgList.add("10000000"+i);	 //L613562
+	}					 //L613562
+	
+	initListView();  //初始化ListView
+	
+	down_arrow.setOnClickListener(new OnClickListener() {  //L613562 下拉图片的点击事件
+		
+		@Override
+		public void onClick(View v) {
+			//定义PopupWindow
+			popWin = new PopupWindow(MainActivity.this);  //L613562
+			popWin.setWidth(input.getWidth());
+			popWin.setHeight(200);
+			popWin.setContentView(listView); //为popuwindow填充内容
+			popWin.setOutsideTouchable(true); //点击popwin以外的区域，自动关闭popwin
+			popWin.showAsDropDown(input, 0, 0); //设置弹出窗口显示的位置
+		}
+	});
+
+//===============initListView()=========================
+
+	private void initListView() {
+		listView = new ListView(this);
+		listView.setBackgroundResource(R.drawable.listview_background);
+		listView.setDivider(null);
+		listView.setVerticalScrollBarEnabled(false);
+		listView.setAdapter(new MyListAdapter());
+	}
+
+//===================MyListAdapter()=====================
+
+	private class MyListAdapter extends BaseAdapter{
+
+		@Override
+		public int getCount() {
+			return msgList.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return position;
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(final int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+			if(convertView == null){
+				convertView = View.inflate(getApplicationContext(), R.layout.list_item, null);  //L613562 解析标签xml文件
+				holder = new ViewHolder();
+				holder.delete = (ImageView) convertView.findViewById(R.id.delete);  //L613562
+				holder.tv_msg = (TextView) convertView.findViewById(R.id.list_item);  //L613562
+				convertView.setTag(holder);
+			}else{
+				holder = (ViewHolder) convertView.getTag();
+			}
+			holder.tv_msg.setText(msgList.get(position));  //设置标签中间文本内容
+			holder.delete.setOnClickListener(new OnClickListener() {  //设置标签右边删除图片点击事件
+				
+				@Override
+				public void onClick(View v) {
+					//删除对应的条目
+					msgList.remove(position);
+					//刷新listView
+					MyListAdapter.this.notifyDataSetChanged();
+				}
+			});
+			convertView.setOnClickListener(new OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					//设置输入框
+					input.setText(msgList.get(position));
+					popWin.dismiss();
+				}
+			});
+			return convertView;
+		}
+		
+	}
+
+//====================ViewHolder holder====================
+
+	private class ViewHolder{
+		TextView tv_msg;
+		ImageView delete;
+	}
+
+//========================================

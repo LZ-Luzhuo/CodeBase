@@ -1,0 +1,58 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L468734
+// 2.TreeXxx两种方式
+//	new TreeSet();  //元素的类实现Comparable<T>接口
+//	new TreeSet(Comparator comparator);  //匿名内部类
+//------------------------Luzhuo Writer-------------------------------
+
+
+//-------------------------------------------------------
+//	new TreeSet();  //元素的类实现Comparable<T>接口
+//=============================================================
+
+public class Student implements Comparable<Student>{
+	private String name;
+	private int age;
+	……
+	@Override
+	public int compareTo(Student s){  //重写方法
+		//主要条件：年龄从小到大
+		int num = this.age - s.age;
+		//次要条件：年龄相同，可能姓名不同
+		//int compareTo(T o); //比较元素顺序，返回正数,0,负数
+		int num2 = num==0?this.name.compareTo(s.name):num;
+		return num2; //若num==0为真，判断姓名，否则num2为0，不添加
+	}
+}
+
+
+//=============================================================
+
+
+//-------------------------------------------------------
+//	new TreeSet(Comparator comparator);  //匿名内部类
+//=============================================================
+
+public static void main(String[] args) {
+
+TreeSet<Student> ts = new TreeSet<Student>(new Comparator<Student>() {
+	@Override
+	public int compare(Student s1,Student s2){
+		//姓名从长到短
+		int num = s2.getName().length()-s1.getName().length();
+		//长度相同，比内容
+		int num2 = num==0?s1.getName().compareTo(s2.getName()):num;
+		//长度相容，内容相同，比年龄
+		int num3 = num2==0?s1.getAge()-s2.getAge():num2;
+		return num3;
+	}
+});
+
+ts.add(new Student("zhangwuji",35));
+……
+for(Student s : ts){
+	System.out.println(s.getName()+"---"+s.getAge());
+}
+}
+
+//=============================================================

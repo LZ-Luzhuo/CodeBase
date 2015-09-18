@@ -1,0 +1,36 @@
+//---------------------------------
+// 1.需修改的位置编号：L651315
+// 2.同工程测试：
+		要测试的类继承AndroidTestCase --> AndroidManifest.xml指定测试信息和测试的包
+// 3.异工程测试：
+		new --> Android Test Project --> 写一个类(要继承AndroidTestCase)
+//----------Luzhuo-write-----------
+
+
+//=================AndroidMainfest.xml=======================
+
+。。。
+<uses-sdk .../>
+<!-- 指定测试信息和要测试的包 --> 
+<instrumentation 
+android:name="android.test.InstrumentationTestRunner"
+        android:targetPackage="com.example.junittest" >    //L651315 targetPackage：要测试的包
+</instrumentation>
+。。。
+    <application >
+        。。。
+        <!-- 指定引用的测试包 -->
+        <uses-library android:name="android.test.runner"/>
+       。。。
+    </application>
+</manifest>
+
+//========================================
+
+
+
+//========================================
+
+public class Test extends AndroidTestCase { //L651315 要测试的类继承AndroidTestCase
+
+//========================================

@@ -1,0 +1,196 @@
+//---------------------------------
+// 1.需修改的位置编号：L651321
+// 2.其余固定文件：
+//		dao.annotation.Column.java
+//		dao.annotation.ID.java
+//		dao.annotation.TableName.java
+//		dao.base.DAO.java
+//		dao.base.DAOSupport.java
+//----------Luzhuo-write-----------
+
+//----------------数据库操作使用-----------------
+
+①建表     (dao.DBHelper)
+②建实体     (dao.domain.News)
+③注解:实体类名(TableName),字段(Column),主键(ID)    (dao.domain.News)
+④建操作实体的接口，作为DAO孩子处理公共，处理特殊     (dao.NewsDao)
+⑤建接口的实现类，作为DAOSupport的子类     (dao.impl.NewsDaoImpl)
+
+*表中的值，除主键为int类型，其余全为String类型
+
+//---------------------------------
+
+
+//--------------test-------------------
+//========================================
+
+public class DBTest extends AndroidTestCase {
+	public void createTable(){
+		DBHelper dbHelper = new DBHelper(getContext());
+		dbHelper.getWritableDatabase();
+	}
+	
+	public void testInsert(){
+		NewsDaoImpl impl = new NewsDaoImpl(getContext());
+		News m = new News();
+		m.setTitle("测试标题一");
+		m.setSummary("测试摘要一a");
+		impl.insert(m);
+	}
+	
+	public void testDelete(){
+		NewsDaoImpl impl = new NewsDaoImpl(getContext());
+		impl.delete(6);
+	}
+	
+	public void testUpdate(){
+		NewsDaoImpl impl = new NewsDaoImpl(getContext());
+		News m = new News();
+		m.setId(3);
+		m.setTitle("hm28");
+		m.setSummary("pp");
+		impl.update(m);
+	}
+	
+	public void testFindAll(){
+		NewsDaoImpl impl = new NewsDaoImpl(getContext());
+		List<News> findAll = impl.findAll();
+	}
+
+	public void testFindByCondition(){
+		NewsDaoImpl impl = new NewsDaoImpl(getContext());
+		List<News> list = impl.findByCondition(new String[]{DBHelper.TABLE_ID,DBHelper.TABLE_NEWS_TITLE}, null, null);
+	}
+}
+
+//========================================
+
+
+
+
+
+//--------------dao.DBHelper-------------------
+// ①建表     (dao.DBHelper)
+//========================================
+
+public class DBHelper extends SQLiteOpenHelper {
+
+	private static final String NAME = "ithm.db";
+	private static final int START_VERSION = 1;
+	private static final int HISTORY_VERSION = 2;
+	private static final int CURRENT_VERSION = 3;
+	
+	// 新闻表：主键+标题+摘要
+	
+	public static final String TABLE_ID = "_id";  //主键都用它代替
+	public static final String TABLE_NEWS_NAME = "news";  //新闻表明
+	public static final String TABLE_NEWS_TITLE = "title";  //新闻标题
+	public static final String TABLE_NEWS_SUMMARY = "summay";  //新闻摘要
+	
+
+	public DBHelper(Context context) {
+		super(context, NAME, null, START_VERSION);
+	}
+
+	@Override
+	public void onCreate(SQLiteDatabase db) {
+		// 建表
+		db.execSQL("CREATE TABLE "+TABLE_NEWS_NAME+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");
+		onUpgrade(db, START_VERSION, CURRENT_VERSION);
+	}
+
+	@Override
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+		switch (oldVersion) {
+		case START_VERSION:
+			db.execSQL("CREATE TABLE "+"bool"+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");
+		case HISTORY_VERSION:
+			db.execSQL("CREATE TABLE "+"class"+" ( "+TABLE_ID+" integer primary key autoincrement, "+TABLE_NEWS_TITLE+" varchar(50), "+TABLE_NEWS_SUMMARY+" varchar(200))");
+		case 3:
+			// 更新表
+		case 4:
+			// 删除表
+			break;
+		}
+	}
+}
+
+//========================================
+
+
+
+
+
+//--------------dao.domain.News-------------------
+// ②建实体     (dao.domain.News)
+// ③注解:实体类名(TableName),字段(Column),主键(ID)    (dao.domain.News)
+//========================================
+
+/*
+ * 新闻实体
+ */
+@TableName(DBHelper.TABLE_NEWS_NAME)
+public class News {
+	// 主键：明确，值的获取
+	// 自增
+	@ID(autoincrement=true)
+	@Column(DBHelper.TABLE_ID)
+	private int id;
+	@Column(DBHelper.TABLE_NEWS_TITLE)
+	private String title;
+	@Column(DBHelper.TABLE_NEWS_SUMMARY)
+	private String summary;
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getTitle() {
+		return title;
+	}
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	public String getSummary() {
+		return summary;
+	}
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+}
+
+//========================================
+
+
+
+//--------------dao.NewsDao-------------------
+// ④建操作实体的接口，作为DAO孩子处理公共，处理特殊     (dao.NewsDao)
+//========================================
+
+/**
+ * 新闻表操作的接口
+ * @author LuZhuo
+ *
+ */
+public interface NewsDao extends DAO<News>{
+	//特有信息
+}
+
+//========================================
+
+
+
+
+//--------------dao.impl.NewsDaoImpl-------------------
+// ⑤建接口的实现类，作为DAOSupport的子类     (dao.impl.NewsDaoImpl)
+//========================================
+
+public class BookDaoImpl extends DAOSupport<Book> implements BookDao {
+
+	public BookDaoImpl(Context context) {
+		super(context);
+	}
+}
+
+//========================================

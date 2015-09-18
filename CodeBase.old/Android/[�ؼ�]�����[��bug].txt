@@ -1,0 +1,210 @@
+//--------------广告条-------------------
+// 1.需修改的位置编号：L634956
+// 2.参考素材在附件
+// 3.布局：1.主页布局
+// 4.拷贝资源 	point_bg.xml		放置于res/drawable文件夹下
+//		point_focured.xml
+//		point_nomal.xml
+// 5.bug:按住拖动一半松手后，会自动移动两页
+//----------Luzhuo-write-----------
+
+
+//-------------------主页布局--------------------
+// 1.文件名：activity_main.xml
+// 2.控件：ViewPager
+// 3.广告条效果，指定时间间隔循环切换
+//========================================
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.itheima.viewpagerdemo.MainActivity" >  //L634956  
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/viewpager"
+        android:background="#33000000"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/image_desc"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/point_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
+
+//========================================
+
+
+
+
+
+
+
+//----------------------------------------
+// 1.文件名：MainActivity.java
+//===================成员变量=====================
+
+	private ViewPager viewpager;
+	private LinearLayout point_group;
+	private TextView image_desc;
+
+	//图片的id资源
+	private final int[] imageIds = {R.drawable.a,R.drawable.b,R.drawable.c,R.drawable.d,R.drawable.e};    //L634956  图片资源的id
+	private ArrayList<ImageView> imageList;
+	
+	//上一个页面的为位置
+	private int lastPointPosition;
+	
+	//图片标题
+	private final String[] imageDescriptions = {"aaa","bbb","ccc","ddd","eee"};  //L634956  图片的文字说明
+	
+//========================================
+
+//=================主体代码=======================
+
+	viewpager = (ViewPager) findViewById(R.id.viewpager);  //L634956  
+	point_group = (LinearLayout) findViewById(R.id.point_group);  //L634956  
+	image_desc  =(TextView) findViewById(R.id.image_desc);  //L634956  
+	image_desc.setText(imageDescriptions[0]);
+	
+	imageList = new ArrayList<ImageView>();
+	for (int i = 0; i < imageIds.length; i++) {
+		//初始化图形资源
+		ImageView image = new ImageView(this);
+		image.setBackgroundResource(imageIds[i]);
+		imageList.add(image);
+		
+		//添加指示点
+		ImageView point = new ImageView(this);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(5, 5);
+		params.rightMargin = 20;
+		point.setLayoutParams(params);
+		point.setBackgroundResource(R.drawable.point_bg);
+		if(i==0){
+			point.setEnabled(true);
+		}else{
+			point.setEnabled(false);
+		}
+		point_group.addView(point);
+	}
+	
+	viewpager.setAdapter(new MyPagerAdapter());
+	viewpager.setCurrentItem(Integer.MAX_VALUE/2-(Integer.MAX_VALUE/2%imageList.size()));
+	viewpager.setOnPageChangeListener(new OnPageChangeListener() {
+		
+		//页面切换调动
+		//position  新的页面位置
+		@Override
+		public void onPageSelected(int position) {
+			position = position%imageList.size();
+			
+			//设置文字描述内容
+			image_desc.setText(imageDescriptions[position]);
+			
+			//改变指示点的状态
+			//把当前点enbale 为true
+			point_group.getChildAt(position).setEnabled(true);
+			//把上一个点设为false
+			point_group.getChildAt(lastPointPosition).setEnabled(false);
+			lastPointPosition = position;
+		}
+		
+		//页面正在滑动的时候回调
+		@Override
+		public void onPageScrolled(int position, float positionOffset,
+				int positionOffsetPixels) {
+			
+		}
+		
+		//页面状态改变的时候回调
+		@Override
+		public void onPageScrollStateChanged(int state) {
+			
+		}
+	});
+	
+
+	//用handler发送延迟信息，实现循环
+	isRunning = true;
+	handler.sendEmptyMessageDelayed(0, 10000); //10s后执行切换页面   //L634956  设置时间间隔
+
+//==================接受延迟消息======================
+
+	//判断是否自动滚动
+	private boolean isRunning = false;
+	
+	private Handler handler = new Handler(){
+		public void handleMessage(android.os.Message msg) {
+			//让viewPager滑动到下一页
+			viewpager.setCurrentItem(viewpager.getCurrentItem()+1);
+			if(isRunning){
+				handler.sendEmptyMessageDelayed(0, 10000); //10s后执行切换页面   //L634956  设置时间间隔
+			}
+		};
+	};
+
+//===================页面退出后的处理=====================
+
+	protected void onDestroy() {
+		isRunning = false;
+		super.onDestroy();
+	};
+
+//================MyPagerAdapter()========================
+
+	private class MyPagerAdapter extends PagerAdapter{
+
+		//获得页面的总数
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return Integer.MAX_VALUE;
+		}
+
+		//获得相应位置上的view
+		//container view的容器，就是viewpage本身
+		//position  相应的位置
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			//给container 添加一个view
+			container.addView(imageList.get(position%imageList.size()));
+			//返回一个和该view相对应的object
+			return imageList.get(position%imageList.size()); //页面位置无限循环
+		}
+		
+		//判断view和Object的对应关系
+		@Override
+		public boolean isViewFromObject(View view, Object object) {
+			return view == object;
+		}
+
+		//销毁对应位置上的Object
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			container.removeView((View) object);
+			object = null;
+		}
+	}
+
+//========================================

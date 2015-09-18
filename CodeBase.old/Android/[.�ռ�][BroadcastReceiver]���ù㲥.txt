@@ -1,0 +1,119 @@
+//-----------------------------------------------------------
+// 1.需修改的位置编号：L153152
+// 2.广播：
+//	收短信		<action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+//
+//	卸载sd卡	<action android:name="android.intent.action.MEDIA_UNMOUNTED"/>
+//  			<action android:name="android.intent.action.MEDIA_REMOVED"/>
+//    			<data android:scheme="file"/> //类型
+//
+//	电话打出	<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.收短信	android:name="android.provider.Telephony.SMS_RECEIVED"
+// 2.权限	<uses-permission android:name="android.permission.RECEIVE_SMS"/>
+//===========================================================
+
+public class SmsReceiver extends BroadcastReceiver {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		System.out.println("sms recive");
+		Object[] objs = (Object[]) intent.getExtras().get("pdus");
+		for (Object obj : objs) {
+			// 得到短信对象
+			SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) obj);
+			String body = smsMessage.getMessageBody();
+			String sender = smsMessage.getOriginatingAddress();
+			System.out.println("body:" + body);  //短信内容
+			System.out.println("sender:" + sender);  //短信发送者号码
+			if ("5556".equals(sender)) {
+				abortBroadcast(); // 终止掉当前的广播
+			}
+		}
+	}
+}
+
+//===========================================================
+
+<receiver android:name="com.itheima.smsreceiver.SmsReceiver" >
+    <intent-filter android:priority="1000">
+         <action android:name="android.provider.Telephony.SMS_RECEIVED"/>
+    </intent-filter>
+</receiver>
+
+//===========================================================
+
+
+
+
+//-----------------------------------------------------------
+// 1.卸载sd卡	<action android:name="android.intent.action.MEDIA_UNMOUNTED"/>
+//   		<action android:name="android.intent.action.MEDIA_REMOVED"/>
+//    		<data android:scheme="file"/> //类型
+// 2.权限	<uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+//===========================================================
+
+public class SDStatusReceiver extends BroadcastReceiver {
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		Toast.makeText(context, "sd卡被移除，微信头像或者图片暂时不可用", 1).show();
+	}
+}
+
+//===========================================================
+
+<receiver  android:name="com.itheima.sdcardmointor.SDStatusReceiver">
+  <intent-filter >
+    <action android:name="android.intent.action.MEDIA_UNMOUNTED"/>
+    <action android:name="android.intent.action.MEDIA_REMOVED"/>
+    <data android:scheme="file"/> //类型
+  </intent-filter>
+</receiver>
+
+//===========================================================
+
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.电话打出	<action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+// 2.权限	<uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS"/>
+//===========================================================
+
+public class OutCallReceiver extends BroadcastReceiver {
+
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		System.out.println(111);
+		String number = getResultData();  //获取广播数据
+		System.out.println("哈哈,有电话打出去了"+number);
+		//判断是否是长途，是否有前缀。。。
+		setResultData(17909+number);  //设置广播数据
+	}
+}
+
+//===========================================================
+
+<receiver android:name="com.example.testdemo1.OutCallReceiver" >
+   <intent-filter android:priority="1000" >
+     <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+   </intent-filter>
+</receiver>
+
+//===========================================================
+
+
+
+
+//-----------------------------------------------------------
+
+//===========================================================
+
+//===========================================================
+
+//===========================================================

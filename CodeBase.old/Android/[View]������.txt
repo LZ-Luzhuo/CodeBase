@@ -1,0 +1,140 @@
+﻿//-----------------------------------------------------------
+// 1.需修改的位置编号：L151313
+// 2.主要两种方式，以及第二种方式的变形
+// 3.
+// 4.第二种：button对象 --> 设置单击 --> 匿名内部类 --> 重写方法
+//	setOnClickListener(new OnClickListener() {
+//		public void onClick(View v) {
+//	}
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.第一种：布局文件配置android:onClick="xxx"  方法：public void xxx(View v){ }
+//========================布局文件===================================
+
+//activity_main.xml
+<RelativeLayout  //相对布局
+ xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+	<Button   //按钮
+	    android:id="@+id/btn_call"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="@string/callNumber"   //按钮上显示的名称
+	    android:onClick="call" />  //onClick动作，并在MainUI创建方法
+
+</RelativeLayout>
+
+//===========================================================
+
+public class MainUI extends ActionBarActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState); 
+		setContentView(R.layout.main);
+	}
+
+	public void call(View v){
+		System.out.println("拨打电话");
+
+	}
+}
+
+//===========================================================
+
+
+
+
+
+
+//-----------------------------------------------------------
+// 1.第二种：button对象 --> 设置单击 --> 匿名内部类 --> 重写方法
+//	setOnClickListener(new OnClickListener() {
+//		public void onClick(View v) {
+//	}
+// 2.变形1：button对象 --> 自定义类 --> 实现接口
+// 3.变形2：类实现OnClickListener 接口并重写里面的onClick方法
+// 4.setOnClickListener(android.view)
+// 5.OnClickListener(android.view.View)
+//===========================================================
+
+
+//-----------------------------------------------------------
+// 1.第二种：button对象 --> 设置单击 --> 匿名内部类 --> 重写方法
+//	setOnClickListener(new OnClickListener() {
+//		public void onClick(View v) {
+//	}
+//===========================================================
+
+public class MainUI2 extends ActionBarActivity {
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState); 
+		setContentView(R.layout.main); 
+		
+		Button btnCall = (Button) findViewById(R.id.btn_call);
+		btnCall.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				System.out.println("MainUI2 拨打电话");
+			}
+		});
+	}
+}
+
+//===========================================================
+
+//-----------------------------------------------------------
+// 2.变形1：button对象 --> 自定义类 --> 实现接口
+//===========================================================
+
+public class MainUI3 extends ActionBarActivity {
+	/**
+	 * 当界面刚被创建时回调此方法
+	 */
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState); 
+		setContentView(R.layout.main); 
+		
+		Button btnCall = (Button) findViewById(R.id.btn_call);
+		btnCall.setOnClickListener(new MyOnClickListener());
+		
+	}
+	class MyOnClickListener implements OnClickListener {
+		@Override
+		public void onClick(View v) {
+			System.out.println("MainUI3 拨打号码");
+		}
+	}
+}
+
+
+//===========================================================
+
+//-----------------------------------------------------------
+// 3.变形2：类实现OnClickListener 接口并重写里面的onClick方法
+//===========================================================
+
+public class MainUI4 extends ActionBarActivity implements OnClickListener{
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState); //必须执行此句代码，执行初始化
+		setContentView(R.layout.main); //设置当前界面显示的布局
+		
+		Button btnCall = (Button) findViewById(R.id.btn_call);
+		btnCall.setOnClickListener(this);
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		System.out.println("MianUI4 拨打电话");
+	}
+}
+
+//===========================================================
+

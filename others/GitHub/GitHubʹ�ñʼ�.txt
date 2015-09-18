@@ -1,0 +1,105 @@
+﻿
+键盘快捷键:? 当前页面可用的快捷键。
+	   w 分支切换菜单
+	   t文件查找和过滤,输入单词过滤
+	   j 向上选择
+	   k 向下选择
+
+https://github.com/LZ-Luzhuo/Demo.git
+
+ 版本库初始化
+从头创建版本库，可以采用先克隆，建立提交数据，最后再通过推送完成GitHub版本库的初始化。步骤如下：
+克隆版本库。
+	创建用户文件夹 --> git clone <仓库目录> <用户目录> 
+	$ git clone https://github.com/LZ-Luzhuo/Demo.git /d/develop/demo
+
+创建文件README.md(Markdown格式)
+
+添加README.md文件并提交。
+	cd 用户目录 --> git status (目录状态) --> git add <文件名> --> git commit –m “user updata.” <文件名> --> git push origin master --> 输入账户和密码(不可见)
+
+查看提交日志:
+	$ git log --pretty=fuller
+
+设置user.name和user.email配置变量。
+	$ git config user.name "Luzhuo"
+	$ git config user.email "luzhuo@vip.qq.com"
+
+
+从已有版本库创建
+GitHub创建库
+本地创建库文件夹 -->  进入文件夹 --> git init --> (后续步骤同上)
+
+为版本库添加名为origin的远程版本库。
+	$ git remote add origin https://github.com/LZ-Luzhuo/Demo.git
+
+
+
+新建分支
+Git分支保存在.git/refs/heads/命名空间下的引用。默认分支master
+在本地创建新的分支，然后推送到GitHub版本库中完成
+GitHub上分支的创建。操作如下：
+本地版本库中建立新分支branches1
+	$ git checkout -b branches1 --> 添加新文件,并提交 --> $ git push origin branches1
+
+删除分支
+在本地删除分支，然后推送到GitHub版本库中完成
+	查看工作分支
+	$ git branch
+	先切换到其他分支
+	$ git checkout master
+	删除branches1分支
+	$ git branch -D branches1
+	推送到GitHub版本库
+	$ git push origin :branches1
+
+
+里程碑tag，保存在.git/refs/tags/路径下。
+创建里程碑tag1
+	$ git tag -m "Tag on new commit" tag1
+查看新建立的里程碑。
+	$ git tag -l -n1
+推送到GitHub远程版本库
+	$ git push origin refs/tags/*
+删除本地里程碑。
+	$ git tag -d tag1
+推送GitHub远程版本库中的里程碑
+	$ git push origin :tag1
+
+
+创建个人主页
+二级域名<user-id>.github.io，托管空间创建名为<user-id>.github.io的版本库，向其master分支提交网站静态页面即可，网站首页index.html。
+创建LZ-Luzhuo.github.io的Git版本库。
+本地克隆版本库 --> 创建index.html --> 提交 --> 推送 --> 访问：http://LZ-Luzhuo.github.io/
+
+创建项目主页
+还可以为每个项目设置主页，项目主页也通过此二级域名进行访问。
+例如创建helloworld项目如果启用了项目主页，可通过网址http://LZ-Luzhuo.github.io/helloworld/访问。
+
+为项目启用项目主页，在项目版本库中创建一个名为gh-pages的分支，并添加静态网页。通过网址http://<user-id>.github.io/<project-name>访问到。
+将当前工作分支切换到一个尚不存在的分支gh-pages。
+	$ git symbolic-ref HEAD refs/heads/gh-pages
+删除暂存区文件
+	$ rm .git/index
+创建项目首页index.html
+	$ printf "hello world.\n" > index.html
+添加文件index.html到暂存区
+	$ git add index.html
+执行提交。提交完毕分支gh-pages完成创建。
+	$ git commit -m "branch gh-pages init."
+执行推送命令
+	$ git push origin gh-pages
+
+
+
+使用专有域名
+在gotgit.github.io根目录下添加文件CNAME，文件内容为：www.worldhello.net。
+更改域名www.worldhello.net的IP地址，指向域名gotgit.github.io对应的IP地址
+	$ dig @8.8.8.8 -t a www.worldhello.net
+	$ dig @8.8.8.8 -t a LZ-Luzhuo.github.io
+浏览器访问 http://www.worldhello.net/ 
+访问网址http://worldhello.net/时GitHub将该网址重定向到正确的地址http://www.worldhello.net/。
+
+Jekyll是支持Textile、Markdown等标记语言的静态网站生成软件，还支持博客和网页模版，项目在GitHub的托管地址： http://github.com/mojombo/jekyll/ ，专有的URL地址为：http://jekyllrb.com/。
+用Jekyll设计网站
+

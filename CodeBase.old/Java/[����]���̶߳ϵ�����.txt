@@ -1,0 +1,117 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L523453
+// 2.多线程断点下载
+// 2.线程数3-5个为宜
+//----------------------------Luzhuo Writer---------------------------
+
+//=============================================================
+
+public class demo {
+  private static int threadCount = 3;  //线程的数量  //L523453 线程数
+  private static long blocksize;  //每个下载区块的大小
+  private static int runningThreadCount;  //正在运行的线程的数量
+  public static void main(String[] args) throws Exception {
+    String  path = "http://192.168.0.103/1.zip";  // L523453 下载路径
+    URL url = new URL(path);
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("GET");
+    conn.setConnectTimeout(5000);
+    int code = conn.getResponseCode();
+    if(code == 200){
+      long size = conn.getContentLength();  //得到服务器端返回的文件的大小
+      System.out.println("服务器文件的大小："+size);
+      blocksize = size / threadCount;
+      //1.首先在本地创建一个大小跟服务器一模一样的空白文件
+      File file = new File("temp.zip");
+      RandomAccessFile raf = new RandomAccessFile(file, "rw");
+      raf.setLength(size);  //设置文件的长度
+      //2.开启若干子线程分别去下载对应的资源
+      runningThreadCount = threadCount;
+      for(int i = 1; i<=threadCount;i++){  //位置都是从0开始的
+        long startIndex = (i-1)*blocksize;
+        long endIndex = i*blocksize-1;
+        if(i==threadCount){
+          endIndex = size-1;  //最后最后一个线程
+        }
+        System.out.println("开启线程："+i+"下载的位置"+startIndex+"~"+endIndex);   // L523453
+        new DownloadThread(path, i, startIndex, endIndex).start();
+      }
+    }
+    conn.disconnect(); 
+  }
+  private static class DownloadThread extends Thread{
+    private int threadId;
+    private long startIndex;
+    private long endIndex;
+    private String path;
+    public DownloadThread(String path, int threadId, long startIndex, long endIndex) {
+      super();
+      this.path = path;
+      this.threadId = threadId;
+      this.startIndex = startIndex;
+      this.endIndex = endIndex;
+    }
+    public void run() {
+      try {
+        //当前线程下载的总大小 
+        int total = 0;
+        File positionFile = new File(threadId+".txt");
+        URL url = new URL(path);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+        //接着从上一次的位置继续下载数据
+        if(positionFile.exists() && positionFile.length()>0){
+          FileInputStream fis = new FileInputStream(positionFile);
+          BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+          //获取当前线程上次下载的总大小是多少
+          String lasttotalstr = br.readLine();
+          int lastTotal = Integer.valueOf(lasttotalstr);
+          System.out.println("上次线程"+threadId+"下载的总大小："+lastTotal);
+          startIndex+=lastTotal;
+          total+=lastTotal; //加上上次下载的总大小
+          fis.close();
+        }
+        
+        conn.setRequestProperty("Range", "bytes="+startIndex+"-"+endIndex);
+        conn.setConnectTimeout(5000);
+        int code = conn.getResponseCode(); //返回状态码是206
+        System.out.println("code="+code);    // L523453
+        
+        InputStream is = conn.getInputStream();
+        File file = new File("temp.zip");    // L523453 保存的文件名
+        RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        //指定文件开始写的位置
+        raf.seek(startIndex);  //设置文件指针偏移量
+        System.out.println("第"+threadId+"个线程：写文件的开始位置："+String.valueOf(startIndex));
+        int len = 0;
+        byte[] buffer = new byte[1024*1024]; // 1M    // L523453
+        while((len = is.read(buffer)) != -1){ 
+          RandomAccessFile rf = new RandomAccessFile(positionFile, "rwd"); //rwd模式直接底层写入内容
+          raf.write(buffer,0,len);
+          total+=len;
+          rf.write(String.valueOf(total).getBytes());
+          rf.close();
+        }
+        is.close();
+        raf.close();
+      } catch (Exception e) {
+        e.printStackTrace();
+      }finally{ 
+        //只有所有的线程都下载完毕后才可以删除记录文件
+        synchronized (demo.class) {
+          System.out.println("线程"+threadId+"下载完毕了");   // L523453
+          runningThreadCount--;
+          if(runningThreadCount<1){
+            System.out.println("所有的线程都工作完毕了。删除临时记录的文件");   // L523453
+            for(int i =1;i<=threadCount;i++){
+            File f = new File(i+".txt");
+            System.out.println(f.delete());   // L523453
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+//=============================================================

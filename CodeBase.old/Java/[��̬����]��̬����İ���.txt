@@ -1,0 +1,89 @@
+//------------------------注解-----------------------------
+// 1.需修改的位置编号：L651322
+// 2.动态代理的使用介绍
+//-------------------------Luzhuo Writer----------------------------
+
+
+//-----------------------------------------------------
+// 1.动态代理使用介绍
+//-----------------------------------------------------
+// 动态代理：用来修改已经具有的对象的方法，控制方法是否执行，或在方法执行之前和执行之后做一些额外的操作
+// Proxy.newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h);
+// 	loader:类加载器
+// 	interfaces:指定代理对象实现哪些接口，通常代理对象要和被代理对象实现相同的接口，保证具有相同方法
+// 	InvocationHandler:处理器对象，当调用代理对象的任何方法时，都会导致此对象中invoke方法执行，在这个方法中可以编写是否允许方法执行，以及在方法执行之前和之后做哪些额外的操作
+// 		{
+// 			Object invoke(Object proxy, Method method, Object[] args)
+// 				proxy:代理者对象
+// 				method:当前调用到的方法
+// 				args:方法的参数
+// 				返回值:这个方法要返回什么
+// 		}
+//-----------------------------------------------------
+
+
+
+
+//-----------------------------------------------------
+// 1.动态代理的案例
+//=======================================================
+
+//如何修改一个类中的某个方法
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+interface 动物{
+	public void 吃();
+	public void 叫();
+}
+public class 狗 implements 动物{ //装饰，实现动物
+	public void 吃(){
+		System.out.println("狗在么么的吃。。。");
+	}
+	public void 叫(){
+		System.out.println("狗在旺旺的叫。。。");
+	}
+public static void main(String[] args) {
+	//  狗 dog = new 继承狗();  //继承
+	//  dog.吃();
+	//  dog.叫();
+	//  动物 ani = new 装饰狗(new 狗());  //装饰
+	//  ani.吃();
+	//  ani.叫();
+	final 狗 dog = new 狗();  //动态代理  Proxy动态代理对象类
+	动物 proxy = (动物)Proxy.newProxyInstance(狗.class.getClassLoader(), 狗.class.getInterfaces(), new InvocationHandler(){
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+			  if("叫".equals(method.getName())){ //当期那调用的方法是叫则。。。
+	 		   System.out.println("代理狗在哈哈的叫。。。");
+			    return null;
+			  }else{
+			    return method.invoke(dog, args);
+	 		  }
+		}	
+	});
+	proxy.吃();
+	proxy.叫();
+}
+}
+//继承，重写父类叫方法
+class 继承狗 extends 狗{  //若对象已有，改造父类就来不及了
+	@Override
+	public void 叫(){
+	System.out.println("狗在喵喵的叫。。。");
+	}
+}
+//装饰
+class 装饰狗 implements 动物{ //要写全部的方法，非常麻烦
+	private 动物 ani = null;
+	public 装饰狗(动物 ani){
+	this.ani = ani;
+	}
+	public void 叫(){
+	System.out.println("狗在咩咩的叫。。。");
+	}
+	public void 吃(){
+	ani.吃();
+	}
+}
+
+//=======================================================

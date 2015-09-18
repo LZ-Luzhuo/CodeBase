@@ -1,0 +1,134 @@
+//-----------------------------------------------------------
+// 1.需修改的位置编号：L613215
+// 2.这里只是简单的使用介绍：
+//			pull生成xml文档
+//			pull解析xml文档
+// 3.org.xmlpull.v1包
+//-----------------------------------------------------------
+
+
+//-----------------------------------------------------------
+// 1.pull生成xml文档
+// 2.序列化对象获得：Xml.newSerializer();
+//===========================================================
+
+	public void testSerializer(){
+		ArrayList<Person> personList = new ArrayList<Person>();
+		for(int x = 1;x<=4;x++){
+			personList.add(new Person(x,"a"+x,x));
+		}
+		
+		XmlSerializer serializer = Xml.newSerializer();
+		try {
+			File path = new File(Environment.getExternalStorageDirectory(),"person.xml");
+			FileOutputStream fos = new FileOutputStream(path);
+			serializer.setOutput(fos, "utf-8");
+			serializer.startDocument("utf-8", true);
+			serializer.startTag(null, "persons");
+			
+			for (Person person : personList) {
+				serializer.startTag(null, "person");
+				serializer.attribute(null, "id", String.valueOf(person.getId()));
+				
+				serializer.startTag(null, "name");
+				serializer.text(person.getName());
+				serializer.endTag(null, "name");
+				
+				serializer.startTag(null, "age");
+				serializer.text(String.valueOf(person.getAge()));
+				serializer.endTag(null, "age");
+				
+				serializer.endTag(null, "person");
+			}
+			
+			serializer.endTag(null, "persons");
+			serializer.endDocument();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.pull解析xml文档
+// 2.序列化对象获得：Xml.newPullParser();
+//===========================================================
+	
+	public void testParser(){
+		try {
+			File path = new File(Environment.getExternalStorageDirectory(),"person.xml");
+			FileInputStream fis = new FileInputStream(path);
+			Person person = null;
+			ArrayList<Person> personList =null;
+			String id;
+			
+			XmlPullParser parser = Xml.newPullParser();
+			parser.setInput(fis, "utf-8");
+			
+			int type = parser.getEventType();
+			while(type != XmlPullParser.END_DOCUMENT){
+				//获取节点名称
+				String tagName = parser.getName();
+				switch (type) {
+				case XmlPullParser.START_TAG:
+					if("persons".equals(tagName)){ //<persons>
+						personList = new ArrayList<Person>();
+					}else if("person".equals(tagName)){ //<person>
+						person = new Person();
+						id = parser.getAttributeValue(null, "id");
+						person.setId(Integer.parseInt(id));
+					}else if("name".equals(tagName)){ //<name>
+						person.setName(parser.nextText());
+					}else if("age".equals(tagName)){ //<age>
+						person.setAge(Integer.parseInt(parser.nextText()));
+					}
+					break;
+				case XmlPullParser.END_TAG:
+					if("person".equals(tagName)){
+						personList.add(person);
+					}
+					break;
+				default:
+					break;
+				}
+				type=parser.next();
+			}
+			System.out.println(personList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+//===========================================================
+
+
+
+//-----------------------------------------------------------
+// 1.生成后的文档
+// 2.文档后缀.xml
+//===========================person.xml================================
+
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<persons>
+	<person id="1">
+		<name>a1</name>
+		<age>1</age>
+	</person>
+	<person id="2">
+		<name>a2</name>
+		<age>2</age>
+	</person>
+	<person id="3">
+		<name>a3</name>
+		<age>3</age>
+	</person>
+	<person id="4">
+		<name>a4</name>
+		<age>4</age>
+	</person>
+</persons>
+
+//===========================================================

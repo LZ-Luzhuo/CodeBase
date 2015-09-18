@@ -1,0 +1,547 @@
+//--------------模拟ViewPager-------------------
+// 1.需修改的位置编号：L351316
+// 2.参考素材在附件
+// 3.布局：1.主页布局
+//	   2.其他布局
+// 4.RadiaGroup 上面的单选切换组
+// 5.图片要放在drawable-mdpi下以免模糊
+//----------Luzhuo-write-----------
+
+
+//-------------------主页布局--------------------
+// 1.文件名：activity_main.xml
+// 2.控件：RadiaGroup 上面的单选切换组
+// 3.RadiaGroup 用于切换图片，可以不要
+//========================================
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    tools:context="com.example.myscrollview.MainActivity" >  //L351316
+
+    <RadioGroup 
+        android:id="@+id/radioGroup"
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+    
+    
+    <com.example.myscrollview.MyScrollView    //L351316 空间类
+        android:id="@+id/myscroll_view"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+         />
+
+</LinearLayout>
+
+//========================================
+
+//----------------------------------------
+// 1.文件名：temp.xml
+// 2.该文件仅用于做试验，实际不用
+//========================================
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/darker_gray"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context="com.example.myscrollview.MainActivity" >
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textSize="50sp" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
+
+//========================================
+
+
+
+
+
+
+
+
+
+//------------------控件类----------------------
+// 1.文件名：MyScrollView.java
+// 2.类要继承ViewGroup
+//		extends ViewGroup
+// 3.这是控件类
+//=================成员变量=======================
+
+	private Context ctx;
+	private boolean isFling; //判断是否发生快速滑动
+	private GestureDetector detector; //手势识别的工具类
+	
+//	private MyScroller myScroller;  //计算位移的工具 	 L351316 自定义的位移工具
+	private Scroller myScroller;  //系统的Scroller类，系统的是非匀速运动
+
+//==================构造方法======================
+
+	public MyScrollView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		this.ctx = context;
+		initView();
+	}
+
+//==================初始化view======================
+
+	private void initView() {
+		//myScroller = new MyScroller(ctx);  //使用自己计算的位移     L351316
+		myScroller = new Scroller(ctx);	      //使用系统计算的位移     L351316
+		detector = new GestureDetector(ctx, new OnGestureListener() {
+
+			@Override
+			public boolean onSingleTapUp(MotionEvent e) {
+				return false;
+			}
+			
+			@Override
+			public void onShowPress(MotionEvent e) {
+				
+			}
+			
+			//响应手指在屏幕上的滑动事件
+			@Override
+			public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+					float distanceY) {
+				
+				//移动屏幕
+				//移动当前view内容一段距离  disX x方向移动的距离，为正值时图片向左移动，为负值时图片向右移动	 disY y方向移动的距离
+				scrollBy((int) distanceX, 0); 
+				
+				
+				//scrollTo(x, y); //将当前视图的基准点移动到某个点  x水平方向x坐标   y竖直方向y坐标
+				return false;
+			}
+			
+			@Override
+			public void onLongPress(MotionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			//发生快速滑动时的回调
+			@Override
+			public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+					float velocityY) {
+				isFling = true;
+				if(velocityX>0 && currId>0){ //快速向右滑动
+					currId--;
+				}else if(velocityX<0 && currId<getChildCount()-1){ //快速向左滑动
+					currId++;
+				}
+				moveToDest(currId);
+				return false;
+			}
+			
+			@Override
+			public boolean onDown(MotionEvent e) {
+				// TODO Auto-generated method stub
+				return false;
+			}
+		});
+	}
+
+//================重写onMeasure()========================
+
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		
+		int size = MeasureSpec.getSize(widthMeasureSpec);
+		int mode = MeasureSpec.getMode(widthMeasureSpec);
+		
+		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		for (int i = 0; i < getChildCount(); i++) {
+			View v = getChildAt(i);
+			v.measure(widthMeasureSpec, heightMeasureSpec);
+		}
+	}
+
+//=================重写onLayout()确定子view的位置=======================
+
+	//对子view进行布局，确定子view的位置
+	@Override
+	protected void onLayout(boolean changed, int l, int t, int r, int b) {
+		for (int i = 0; i < getChildCount(); i++) {
+			View view = getChildAt(i); 
+			view.layout(0+i*getWidth(), 0, getWidth()+i*getWidth(), getHeight());
+		}
+	}
+
+//========================================
+//----------------------------------------
+// 事件传递机制
+// 1.view执行dispatchTouchEvent方法，开始分发事件
+// 2.执行onInterceptTouchEvent判断是否中断事件
+// 3.执行onTouchEvent方法，去处理事件
+//==================.重写onTouchEvent方法，监听touch事件，并用scrollTo()或scroolBy()方法移动view======================
+
+	//当期的id值	显示在屏幕上子view的下标
+	private int currId = 0;
+	private int firstY = 0;
+
+	//是否中断事件的传递
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		boolean result = false;
+		switch (ev.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			//解决拖动的时候，图片调动的bug
+			detector.onTouchEvent(ev);
+			firstX = (int) ev.getX();
+			firstY = (int) ev.getY();
+			break;
+
+		case MotionEvent.ACTION_MOVE:
+			//手指在屏幕上水平移动的绝对值
+			int disx = (int) Math.abs(ev.getX()-firstX);
+			//手指在屏幕上竖直移动的绝对值
+			int disy = (int) Math.abs(ev.getY()-firstY);
+			if(disx>disy && disx>10){
+				result = true;
+			}else{
+				result = false;
+			}
+			break;
+			
+		case MotionEvent.ACTION_UP:
+			
+			break;
+		}
+		return result; //true中断 false不中断
+	}
+
+
+	//down事件时的x坐标
+	private int firstX = 0;
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		super.onTouchEvent(event);
+		
+		detector.onTouchEvent(event);
+		
+		//添加自己的事件解析
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			firstX = (int) event.getX();
+			break;
+
+		case MotionEvent.ACTION_MOVE:
+			
+			break;
+			
+		case MotionEvent.ACTION_UP:
+			if(!isFling){ //在没有发生快速滑动的时候才执行按位置判断currid
+				int nextId = 0;
+				if(event.getX()-firstX>getWidth()/2){ //手指向右滑动超过屏幕的1/2.当前currid-1
+					nextId = currId -1;
+				}else if(firstX-event.getX()>getWidth()/2){ //手指向左滑动，超过屏幕1/2，当前currid+1
+					nextId = currId +1;
+				}else{
+					nextId = currId;
+				}
+				moveToDest(nextId);
+			}
+			isFling = false;
+			break;
+		}
+		return true;
+	}
+
+//=====================页面切换的监听事件===================
+//================moveToDest()========================
+
+	//移动到指定的屏幕上		nextId 屏幕的下标
+	public void moveToDest(int nextId) {
+
+		//确保nextId>=0
+		currId = (nextId>=0)?nextId:0;
+		//确保nextId<=getChildCount()-1
+		currId = (nextId<=getChildCount()-1)?nextId:(getChildCount()-1);
+		
+		//触发listener事件
+		if(PageChangeListener!=null){
+			PageChangeListener.moveToDest(currId);
+		}
+		
+		int distance = currId*getWidth()-getScrollX(); //最终的位置-现在的位置=要移动的位置
+	
+		//设置运行的时间
+		//myScroller.startScroll(getScrollX(),0,distance,0);   //L351316 使用自定义scroll用这个，用系统的用下面那个
+		myScroller.startScroll(getScrollX(),0,distance,0,Math.abs(distance));
+		
+		//刷新当前view，onDraw()方法的执行
+		invalidate();
+		
+	}
+	
+//===================invalidate() 会导致computeScroll()这个方法的执行=====================
+
+	//invalidate() 会导致computeScroll()这个方法的执行
+	@Override
+	public void computeScroll() {
+		if(myScroller.computeScrollOffset()){
+			int newX = (int) myScroller.getCurrX();
+			scrollTo(newX, 0);
+			invalidate();
+		};
+	} 
+
+//=================页面改变时的监听接口=======================
+
+	private MyPageChangeListener PageChangeListener;
+
+	public MyPageChangeListener getPageChangeListener() {
+		return PageChangeListener;
+	}
+
+	public void setPageChangeListener(MyPageChangeListener pageChangeListener) {
+		PageChangeListener = pageChangeListener;
+	}
+	
+	//页面改变时的监听接口
+	public interface MyPageChangeListener{
+		void moveToDest(int currid);
+	}
+
+//========================================
+
+
+
+
+
+//------------------调用类----------------------
+// 1.文件名：MainActivity.java
+//================成员变量========================
+
+	private MyScrollView msv;   //L351316 模拟的ViewGroup
+
+	//图片资源ID 数组
+	private int[] ids = new int[]{R.drawable.a1,R.drawable.a2,R.drawable.a3,R.drawable.a4,R.drawable.a5,R.drawable.a6};    //L351316 资源数组
+
+	private RadioGroup radioGroup;    //L351316 单选组
+
+//================主体方法========================
+
+	msv = (MyScrollView) findViewById(R.id.myscroll_view);
+	radioGroup = (RadioGroup) findViewById(R.id.radioGroup);
+		for (int i = 0; i < ids.length; i++) {
+		ImageView image = new ImageView(this);
+		image.setBackgroundResource(ids[i]);
+		msv.addView(image);
+		}
+	
+	msv.setPageChangeListener(new MyPageChangeListener() {
+		
+		@Override
+		public void moveToDest(int currid) {
+			((RadioButton)radioGroup.getChildAt(currid)).setChecked(true);
+			}
+	});
+	
+	radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+		
+		@Override
+		public void onCheckedChanged(RadioGroup group, int checkedId) {
+				msv.moveToDest(checkedId);
+		}
+	});
+		
+	//给自定义viewGroup添加测试的布局
+	View temp = getLayoutInflater().inflate(R.layout.temp, null);
+	msv.addView(temp,2);
+	
+	for (int i = 0; i < msv.getChildCount(); i++) {
+		//添加RadioBtoon
+		RadioButton rbtn = new RadioButton(this);
+			rbtn.setId(i);
+		radioGroup.addView(rbtn);
+		if(i == 0){
+			rbtn.setChecked(true);
+		}
+	}	
+}
+
+//========================================
+
+
+
+
+
+
+//-----------------自定义计算位移工具类-----------------------
+// 1.文件名：MyScroller.java
+// 2.可使用该类计算位移，也可使用系统的Scroll类
+//========================================
+
+public class MyScroller {
+	private int startX;
+	private int startY;
+	private int distanceX;
+	private int distanceY;
+	//开始执行动画的时间
+	private long startTime;
+	//判断是否还在执行动画，true还在运行，false已经停止
+	private boolean isFinish;
+
+	public MyScroller(Context context){
+		
+	}
+	
+	//开始移动		参数：开始时的x坐标，开始时的y坐标，x方向要移动的，y方向要移动的距离
+	public void startScroll(int startX, int startY, int disX, int disY) {
+		this.startX = startX;
+		this.startY = startY;
+		this.distanceX = disX;
+		this.distanceY = disY;
+		this.startTime = SystemClock.uptimeMillis();
+		
+		this.isFinish = false;
+	}
+
+	//默认运行的时间500毫秒
+	private int duration = 500;
+	private long currX; //当前的x值
+	private long currY; //当前的y值
+	//计算一下当前的运行状况	返回值true还在运行，false运行结束
+	public boolean computeScrollOffset() {
+		if(isFinish){
+			return false;
+		}
+		//获得所用的时间
+		long passTime = SystemClock.uptimeMillis()-startTime;
+		//如果时间还在允许的范围内
+		if(passTime<duration){
+			//当前的位置 = 开始的位置 + 移动距离(距离=速度*时间)
+			currX = startX + distanceX*passTime/duration;
+			currY = startY + distanceY*passTime/duration;
+		}else{
+			currX = startX + distanceX;
+			currY = startY + distanceY;
+			isFinish = true;
+		}
+		return true;
+	}
+
+	public long getCurrX() {
+		return currX;
+	}
+
+	public void setCurrX(long currX) {
+		this.currX = currX;
+	}
+}
+
+//========================================

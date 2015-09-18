@@ -1,0 +1,103 @@
+//-------------------------------------------------------
+// 1.需修改的位置编号：L513215
+// 2.需要c3p0连接池jar包
+// 3.需要DBUtils框架jar包
+// 4.c3p0连接池配置见《[数据库]连接池.txt》
+//-----------------------语法--------------------------------
+// DBUtils数据库工具框架(Apache):
+// DbUtils工具类：(org.apache.commons.dbutils)
+//   public static void close(...); //检查参数是否为null，不是则关闭Connection,Statement,ResultSet
+//   public static void closeQuietly(...); //不仅能在null情况下避免关闭，还隐藏抛出的SQLException
+//   public static void commitAndCloseQuietly(Connection conn); //用来提交/关闭连接，不抛异常
+//   public static boolean loadDriver(java.lang.String driverClassName); //装载注册jdbc驱动true
+// 
+// QueryRunner：需要控制事务时，用这组(两行代码搞定增删改查) (org.apache.commons.dbutils)
+//   int update(Connection conn,String sql);
+//   int update(Connection conn,String sql,Object... params);
+//   int update(Connection conn,String sql,Object param);
+// 
+//   <T> T query(Connection conn,String sql,ResultSetHandler<T> rsh);
+//   <T> T query(Connection conn,String sql,ResultSetHandler<T> rsh,Object... params);
+// 
+// QueryRunner：不需要控制事务时，用这组(两行代码搞定增删改查)
+//   int update(String sql);
+//   int update(String sql,Object... params);
+//   int update(String sql,Object param);
+// 
+//   <T> T query(String sql,ResultSetHandler<T> rsh);
+//   <T> T query(String sql,ResultSetHandler<T> rsh,Object... params);
+// 
+// ResultSetHandler：提供了很多实现类(org.apache.commons.dbutils.handlers)
+// ArrayHandler：把结果集中的第一行数据转成对象数组
+//   ArrayListHandler：把结果集中的额每一行数组转成一个对象数据，放在List中
+//   BeanHandler：将结果集中的第一行数据封装到一个JavaBean实例中
+//   BeanListHandler：将结果集中的每一行数据封装到一个JavaBean实例中，放在List中
+//   MapHandler：将结果集中的第一行数据封装到Map里，key是列名，value是对应的值
+//   MapListHandler：将结果集中的每一行数据封装到Map里，放在List中
+//   ColumnListHandler(int columnIndex)：将结果集中的某一列的数据放在List中
+//   ColumnListHandler(String columnName)
+//   KeyedHandler(int columnIndex)：将结果集中的每一行数据封装到一个Map里(List<Map>)，把这些Map存在Map里
+//   KeyedHandler(String columnNmae)
+//   ScalarHandler(int columnIndex)：获取结果集中第一行数据指定列的值，常用来进行单值查询
+//   ScalarHandler(String columnNmae) 
+//-------------------------------------------------------
+
+
+//-------------------------------------------------------
+// 1.主要语句：
+//		ComboPooledDataSource dataSource = new ComboPooledDataSource();
+//		QueryRunner runner = new QueryRunner(dataSource); //为避免出错，尽量每次使用都new一个
+//		runner.update(String sql,Object... params); 
+//		<T> T = runner.query(String sql, ResultSetHandler<T> rsh, Object... params);
+//=============================================================
+
+ComboPooledDataSource dataSource = new ComboPooledDataSource();
+QueryRunner runner = new QueryRunner(dataSource);
+runner.update("update table1 set age=? where name=?",12,"a10"); //改
+
+QueryRunner runner1 = new QueryRunner(dataSource);
+List<Person> list = runner1.query("select * from table1", new ResultSetHandler<List<Person>>(){
+	public List<Person> handle(ResultSet rs) throws SQLException {
+		List<Person> list = new ArrayList<Person>();
+		while(rs.next()){
+			Person acc = new Person();
+			acc.setName(rs.getString("name"));
+			acc.setAge(rs.getInt("age"));
+			list.add(acc);
+		}
+		return list;
+	}
+});
+System.out.println(list);
+
+//=============================================================
+
+
+
+
+
+//-------------------------------------------------------
+// 1.ResultSetHandler的几个常用的实现类
+//=============================ResultSetHandler================================
+
+QueryRunner runner = new QueryRunner(new ComboPooledDataSource());
+//ArrayHandler：把结果集中的第一行数据转成对象数组
+Object[] objs = runner.query("select * from account where money>?",new ArrayHandler(),500);
+//ArrayListHandler：把结果集中的额每一行数据转成一个对象数据，放在List中
+List<Object[]> list = runner.query("select * from account where money>?", new ArrayListHandler(),500);
+//BeanHandler：将结果集中的第一行数据封装到一个JavaBean实例中
+Account acc = runner.query("select * from account where money>?", new BeanHandler<Account>(Account.class),500);
+//BeanListHandler：将结果集中的每一行数据封装到一个JavaBean实例中，放在List中
+List<Account> list = runner.query("select * from account where money>?", new BeanListHandler<Account>(Account.class),500);
+//MapHandler：将结果集中的第一行数据封装到Map里，key是列名，value是对应的值
+Map<String, Object> map = runner.query("select * from account where money>?", new MapHandler(),500);
+//MapListHandler：将结果集中的每一行数据封装到Map里，放在List中
+List<Map<String,Object>> list = runner.query("select * from account where money>?", new MapListHandler(), 500);
+//ColumnListHandler：将结果集中的某一列的数据放在List中
+List<Object> list = runner.query("select * from account where money>?", new ColumnListHandler(3),500);
+//KeyedHandler(name)：将结果集中的每一行数据封装到一个Map里(List<Map>)，把这些Map存在Map里
+Map<Object, Map<String, Object>> map = runner.query("select * from account where money>?", new KeyedHandler("id"),500);
+//ScalarHandler：获取结果集中第一行数据指定列的值，常用来进行单值查询
+Object count = runner.query("select count(*) from account", new ScalarHandler());
+
+//=============================================================

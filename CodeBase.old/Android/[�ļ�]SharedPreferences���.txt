@@ -1,0 +1,52 @@
+﻿//-----------------------------------------------------------
+// 1.需修改的位置编号：L563515
+//-----------------------------------------------------------
+
+
+
+//-----------------------------------------------------------
+// 1.维护的是xml文件，只管存取就行  /data/data/包名/shared_prefs/itheima.xml
+// 2.类：SharedPreferences
+//	Context.getSharedPreferences(String name, int mode);
+//	方法：
+//		getString(key, defValue);	String  //获取数据
+//   类：Edit
+//	Edit edit = SharedPreferences.edit(); //获得Editor编辑对象
+//  	方法：
+//		putString(key, value); Edit //添加数据
+//		commit();	 boolean  //提交
+//===========================================================
+
+// /data/data/包名/shared_prefs/itheima.xml
+SharedPreferences sp=context.getSharedPreferences("itheima",Context.MODE_PRIVATE);
+// 获得一个编辑对象
+Editor edit = sp.edit();
+// 存数据
+edit.putString("number", number);
+edit.putString("password", password);
+// 提交,数据真正存储起来了
+edit.commit();
+
+
+String number = sp.getString("number", null);
+
+//===========================================================
+
+
+//==========================mode(权限模式)=================================
+
+文件权限：
+私有文件：Context.MODE_PRIVATE
+可读文件：Context.MODE_WORLD_READABLE
+可写文件：Context.MODE_WORLD_WRITEABLE
+可读可写文件：Context.MODE_WORLD_READABLE + Context.MODE_WORLD_WRITEABLE
+
+权限：—  ———  ———   ———
+第一位：代表文件的类型：d 文件夹; — 文件; l 挂载某一个文件
+第2-4位：代表当前用户的权限：r 可读;  w 可写;  x 可执行  (rw- 110=6 可读可写)
+第5-7位：当前用户所在组的其他组员的权限
+第8-10位：其他所有的权限：——— 没有权限; r—可读; -w- 可写; rw- 可读可写
+
+修改权限：adb shell  cd /data/data/包名/files  ls –l  chmod 666 private.txt
+
+//===========================================================

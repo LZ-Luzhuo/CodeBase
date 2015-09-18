@@ -1,0 +1,30 @@
+//-----------------------------------------------------------
+
+<manifest >
+
+    <uses-sdk />
+
+    <application >
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name" 
+
+	    //在activity里设置
+            android:screenOrientation="portrait">
+
+            <intent-filter>
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+
+
+//-----------------------------------------------------------
+
+android:screenOrientation	landscape	此页面横屏显示
+				portrait	此页面数竖屏显示
+
+
+//-----------------------------------------------------------

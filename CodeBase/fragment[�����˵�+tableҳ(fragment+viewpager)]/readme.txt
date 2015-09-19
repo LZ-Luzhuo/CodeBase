@@ -1,3 +1,4 @@
+滑动菜单+table页
 开源框架SlidingMenu的使用:侧滑菜单
 内容页都继承BaseFragment类
 

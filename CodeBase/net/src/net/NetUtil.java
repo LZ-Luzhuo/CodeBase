@@ -1,4 +1,4 @@
-﻿package com.example.luzhuo.utils;
+﻿package com.example.lzchat.net;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -7,8 +7,24 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 
-import com.example.luzhuo.GlobalParams;
+import com.example.lzchat.GlobalParams;
 
+/**
+ * =================================================
+ * 
+ * 作者:卢卓
+ * 
+ * 版本:1.0
+ * 
+ * 创建日期:2015-9-25 下午9:24:58
+ * 
+ * 描述:网络工具,主要用于网络判断
+ * 
+ * 修订历史:
+ * 
+ * 
+ * =================================================
+ **/
 public class NetUtil {
 
 	/**

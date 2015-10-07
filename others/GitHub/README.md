@@ -33,6 +33,7 @@ Markdown语法:
 
 图片:
 	![](ImageUrl)	-->	插入图片
+	![](/d/xx.jpg)	-->	插入本地相对图片
 
 表格:
 	head1 | head2  | head2

@@ -14,7 +14,7 @@
 //		conn.close();
 //=============================================================
 
-//到类加载目录下找c3p0-config.xml.xml
+//到类加载目录下找c3p0-config.xml
 ComboPooledDataSource source = new ComboPooledDataSource();
 //ComboPooledDataSource source = new ComboPooledDataSource("aaa");
 //source.setDriverClass("com.mysql.jdbc.Driver");

@@ -1,7 +1,6 @@
-﻿package com.example.lotterydemo.net;
+﻿package com.example.lzchat.net;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;
@@ -13,12 +12,25 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.example.lotterydemo.ConstantValue;
-import com.example.lotterydemo.GlobalParams;
+import com.example.lzchat.ConstantValue;
+import com.example.lzchat.GlobalParams;
 
 /**
-* Http客户端工具
-*/
+ * =================================================
+ * 
+ * 作者:卢卓
+ * 
+ * 版本:1.0
+ * 
+ * 创建日期:2015-9-25 下午9:15:02
+ * 
+ * 描述:Http客户端工具
+ * 
+ * 修订历史:
+ * 
+ * 
+ * =================================================
+ **/
 public class HttpClientUtil {
 	private HttpClient client;
 	private HttpPost post;

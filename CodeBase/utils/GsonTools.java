@@ -68,6 +68,7 @@ public class GsonTools {
 	 * @param cls Bean.class
 	 * @return List<Bean>
 	 */
+	@Deprecated
 	public static <T> List<T> JsonToList(String json, Class<T> cls) {
 		Gson gson = new Gson();
 		List<T> list = gson.fromJson(json, new TypeToken<List<T>>() {}.getType());
@@ -90,6 +91,7 @@ public class GsonTools {
 	 * @param json jsonString
 	 * @return Map<String, T>
 	 */
+	@Deprecated
 	public static <T> Map<String, T> jsonToMap(String json) {
 		Map<String, T> map = null;
 		Gson gson = new Gson();

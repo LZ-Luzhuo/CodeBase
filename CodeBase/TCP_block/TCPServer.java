@@ -86,20 +86,36 @@ public class TCPServer {
 										
 									// 文本消息action=text
 									} else if ("text".equals(action)) {
-										// 文本消息
-										String sender = map.get("sender");
-										String receiver = map.get("receiver");
-										String content = map.get("content");
-										
-										// 从容器中根据接收者获取对应的client
-										Socket s = clients.get(receiver);
-										if (s != null) {
-											// 如果存在,则表示在线,就把接收到的内容转发给他
-											OutputStream output = s.getOutputStream();
-											output.write(content.getBytes());
-										} else {
-											// TODO 不存在表示离线 ,将信息存起来,在线时在发送
-										}
+											if(receiver.equals("ALL")){
+											// 群发:将消息转给其他用户
+											 Iterator iter = clients.entrySet().iterator(); 
+											 while (iter.hasNext()) { 
+												 Map.Entry entry = (Map.Entry) iter.next(); 
+												 Socket s = (Socket) entry.getValue(); 
+      											 // if (s != client) { } //不发给自己
+												 if(s.isConnected()){ // 包括发给自己
+													 OutputStream output = s.getOutputStream();
+													 System.out.println("群发的内容:"+content);
+													 output.write(content.getBytes());
+												 }
+											 }else{
+													//消息发给指定客户端的
+													// 文本消息
+													String sender = map.get("sender");
+													String receiver = map.get("receiver");
+													String content = map.get("content");
+													
+													// 从容器中根据接收者获取对应的client
+													Socket s = clients.get(receiver);
+													if (s != null) {
+														// 如果存在,则表示在线,就把接收到的内容转发给他
+														OutputStream output = s.getOutputStream();
+														System.out.println("发送的内容:"+content);
+														output.write(content.getBytes());
+													} else {
+														// TODO 不存在表示离线 ,将信息存起来,在线时在发送
+													}
+											 }
 									}
 									
 								// 处理请求的其他type

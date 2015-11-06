@@ -89,6 +89,7 @@ public class ChatApplication extends Application {
 				activity.finish();
 			}
 		}
+		activitys.clear();
 	}
 
 	private void closeServices() {
@@ -99,6 +100,7 @@ public class ChatApplication extends Application {
 				stopService(new Intent(this, service.getClass()));
 			}
 		}
+		services.clear();
 	}
 
 	/**

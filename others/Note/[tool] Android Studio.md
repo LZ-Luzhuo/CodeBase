@@ -119,3 +119,5 @@
 > - Alt+Insert 获取get/set/构造/toString   (*Ctrl+Alt+s*)
 > - sout:打印 (*syso*)
 > - F8:调试
+> - Ctrl+Alt+f:变成成员变量
+> - Ctrl+Alt+l:格式化

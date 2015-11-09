@@ -16,3 +16,7 @@
 >> - 自定义了输入框背景
 >> - 输入文字显示delete按钮
 >> - ![](/EditText/EditText.gif)
+
+### Parcelable
+> Parcelable的案例
+>> - `public class Bean implements Parcelable { ... }`

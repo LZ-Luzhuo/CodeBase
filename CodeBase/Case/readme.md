@@ -20,3 +20,10 @@
 ### Parcelable
 > Parcelable的案例
 >> - `public class Bean implements Parcelable { ... }`
+
+### ListView
+> ListView的优化
+>> - 1.复用convertView;
+>> - 2.异步加载网络图片;
+>> - 3.快速滑动时不显示图片;
+>> - universal-image-loader-1.9.4.jar

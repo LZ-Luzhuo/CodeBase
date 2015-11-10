@@ -12,7 +12,7 @@ import android.os.Parcelable;
  * <p/>
  * 创建日期:2015/11/9 21:39
  * <p/>
- * 描述:Parcelable类的案例
+ * 描述:这是Parcelable的案例,Parcelable是存在内存中的序列化,用于传递数据.
  * <p/>
  * 修订历史:
  * <p/>

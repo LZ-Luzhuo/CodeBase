@@ -75,14 +75,9 @@ public class Resource {
          * @return 资源数组
          */
         public static String[] getMoreGrilImage(int num){
-                String[] grilImage = new String[]{"1","2","3"};
-                if(num<=0){
-                        return null;
-                }
-
                 String[] all = new String[num*grilImage.length];
-                for(int x = 0; x >= num ; x++) {
-                        System.arraycopy(grilImage, 0*grilImage.length, all, 0, grilImage.length);
+                for(int x = 0; x < num ; x++) {
+                        System.arraycopy(grilImage, 0, all, x*grilImage.length, grilImage.length);
                 }
                 return all;
         }

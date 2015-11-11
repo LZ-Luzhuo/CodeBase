@@ -27,7 +27,7 @@ import com.example.luzhuo.listview.utils.AsyncImageLoderUtil;
  * <p/>
  * =================================================
  **/
-public class ImageAdapter extends BaseAdapter{
+public class ImageAdapter extends BaseAdapter {
     private Context context;
     private String[] listImage;
     private LayoutInflater inflater;
@@ -78,7 +78,7 @@ public class ImageAdapter extends BaseAdapter{
         return  convertView;
     }
 
-    static class ViewHolder{
+    class ViewHolder{
         ImageView imageview;
         TextView textview;
     }

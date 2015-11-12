@@ -27,3 +27,17 @@
 >> - 2.异步加载网络图片;
 >> - 3.快速滑动时不显示图片;
 >> - universal-image-loader-1.9.4.jar
+
+### LruCache
+> 内存缓存优化和磁盘缓存优化
+>> - abc.jpg放在SD卡根目录下
+>> - SD卡根目录下的` img2 `文件夹就是该案例的缓存目录
+>> - 清理缓存策略全部采用先添加先清除,后添加后清除
+>> - 目前有部分手机没有SD卡功能,可能需要改动ImageCache.java里的...代码,考虑没有SD卡时可将目录改为手机自带存储目录(**该部分代码未加,以后可考虑加上**)
+>>
+		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+			File externalStorageDirectory = Environment.getExternalStorageDirectory();
+			String path = externalStorageDirectory.getAbsolutePath() + ConstantValue.IMAGE_PATH;
+>>			
+			diskLruCache = DiskLruCache.openCache(GloableParams.context, new File(path), DIS_CACHE_SIZE);
+		}

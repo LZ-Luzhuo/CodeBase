@@ -28,7 +28,10 @@ public class Fragment2 extends Fragment {
 	}
 	
 	private void initData() {
-		String string  = FragmentUtil.getInstance().getBundle(this).getString("String");;
-		textview.setText(string);
+		Bundle bundle = FragmentUtil.getInstance().getBundle(this);
+		if(bundle!=null){
+			String string = bundle.getString("String");
+			if(string!=null) textview.setText(string);
+		}
 	}
 }

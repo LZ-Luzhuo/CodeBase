@@ -14,7 +14,7 @@ import android.support.v4.app.FragmentTransaction;
  * 
  * 创建日期:2015-11-12 下午1:59:06
  * 
- * 描述:这是fragment管理工具.<br>Fragment适合处理业务操作简单,数据传输安全级别要求不高的场景.
+ * 描述:这是fragment管理工具.<br>推荐使用{@link #changeFragment(int, Fragment, Fragment)}
  * 
  * 修订历史:
  * 
@@ -43,26 +43,26 @@ public class FragmentUtil {
 		return instance;
 	}
 	
-	public void changeFragment(int containerId,Fragment target){
-		changeFragment(containerId,target, false, null);
+	public void replaceFragment(int containerId,Fragment target){
+		replaceFragment(containerId,target, false, null);
 	}
 	
-	public void changeFragment(int containerId,Fragment target, boolean isAddStack){
-		changeFragment(containerId,target, isAddStack, null);
+	public void replaceFragment(int containerId,Fragment target, boolean isAddStack){
+		replaceFragment(containerId,target, isAddStack, null);
 	}
 	
-	public void changeFragment(int containerId,Fragment target, Bundle bundle){
-		changeFragment(containerId,target, false, bundle);
+	public void replaceFragment(int containerId,Fragment target, Bundle bundle){
+		replaceFragment(containerId,target, false, bundle);
 	}
 	
 	/**
-	 * 切换Fragment
+	 * 切换Fragment<br>适合处理业务操作简单,数据传输安全级别要求不高的场景.<br>该方法将会销毁旧的fragment,接受new出新的fragment,推荐使用{@link #changeFragment(Fragment, Fragment)}进行切换
 	 * @param containerId 放Fragment的FrameLayout容器id
 	 * @param target 要切换的Fragment
 	 * @param isAddStack 是否添加到栈里面,如果添加到栈里面可以使用返回键;不建议将第一个Fragment添加到栈里
 	 * @param bundle / null;存储要传输的数据,getBundle(Fragment)获取数据
 	 */
-	public void changeFragment(int containerId,Fragment target, boolean isAddStack, Bundle bundle){
+	public void replaceFragment(int containerId,Fragment target, boolean isAddStack, Bundle bundle){
 		if(bundle != null){
 			// 存储要传输的数据
 			target.setArguments(bundle);
@@ -118,5 +118,25 @@ public class FragmentUtil {
 		if(isAddStack) //是否添加到栈里面,如果添加到栈里面可以使用返回键
 			add = add.addToBackStack(null);
 		add.commit();
+	}
+	
+	/**
+	 * 切换Fragment,推荐使用该方法,该方法不会销毁旧的Fragment.<br>该方法不需要new出新的Fragment,推荐使用数组管理<br>该方法可以处理复杂业务
+	 * <br>不支持传递数据
+	 * @param containerId 放Fragment的FrameLayout容器id
+	 * @param newFragment 切换的Fragment
+	 * @param oldFragment / null: 被切换的Fragment
+	 */
+	public void changeFragment(int containerId,Fragment newFragment, Fragment oldFragment){
+		if(newFragment==oldFragment) return;
+		
+		FragmentTransaction transaction = activity.getSupportFragmentManager().beginTransaction();
+		if(oldFragment != null){
+			transaction.hide(oldFragment);
+		}
+		if (!newFragment.isAdded()) {
+			transaction.add(containerId, newFragment);
+		}
+		transaction.show(newFragment).commit();
 	}
 }

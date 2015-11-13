@@ -41,3 +41,6 @@
 >>			
 			diskLruCache = DiskLruCache.openCache(GloableParams.context, new File(path), DIS_CACHE_SIZE);
 		}
+
+### AsyncTask
+> AsyncTask 线程池案例

@@ -44,3 +44,8 @@
 
 ### AsyncTask
 > AsyncTask 线程池案例
+
+### Load Big Image View
+> 加载巨幅图画的案例(非缩小式压缩)
+> BitmapRegionDecoder类的使用
+>> - qingmingshanghetu.jpg放在assets目录下

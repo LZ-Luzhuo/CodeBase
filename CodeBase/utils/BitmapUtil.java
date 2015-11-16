@@ -1,8 +1,12 @@
 package com.example.utilsdemo.utils;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Build;
@@ -47,5 +51,24 @@ public class BitmapUtil {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1)
 			return bitmap.getByteCount();
 		return bitmap.getRowBytes() * bitmap.getHeight();
+	}
+	
+	/**
+	 * 从assets获取图片
+	 * @param context 上下文
+	 * @param fileName 资源名
+	 * @return Bitmap
+	 */
+	public static Bitmap getBitmapFromAssets(Context context, String fileName) {
+		Bitmap image = null;
+		AssetManager am = context.getAssets();
+		try {
+			InputStream is = am.open(fileName);
+			image = BitmapFactory.decodeStream(is);
+			is.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return image;
 	}
 }

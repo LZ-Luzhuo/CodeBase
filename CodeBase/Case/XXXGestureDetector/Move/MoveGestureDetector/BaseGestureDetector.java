@@ -1,4 +1,4 @@
-package com.example.bitmapregiondecoderdemo.GestureDetector;
+package com.example.gesturedetectordemo.MoveGestureDetector;
 
 import android.content.Context;
 import android.view.MotionEvent;

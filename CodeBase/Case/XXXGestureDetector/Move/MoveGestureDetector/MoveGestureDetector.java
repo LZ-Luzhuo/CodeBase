@@ -1,4 +1,4 @@
-package com.example.bitmapregiondecoderdemo.GestureDetector;
+package com.example.gesturedetectordemo.MoveGestureDetector;
 
 import android.content.Context;
 import android.graphics.PointF;
@@ -13,7 +13,7 @@ import android.view.MotionEvent;
  * 
  * 创建日期:2015-11-13 下午9:58:04
  * 
- * 描述:Move移动手势代码
+ * 描述:Move移动手势代码<br>手指向左滑,-x;向右滑+x;<br>手指向上滑,-y;向下滑+y;
  * 
  * 修订历史:
  * 

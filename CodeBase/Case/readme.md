@@ -33,14 +33,11 @@
 >> - abc.jpg放在SD卡根目录下
 >> - SD卡根目录下的` img2 `文件夹就是该案例的缓存目录
 >> - 清理缓存策略全部采用先添加先清除,后添加后清除
->> - 目前有部分手机没有SD卡功能,可能需要改动ImageCache.java里的...代码,考虑没有SD卡时可将目录改为手机自带存储目录(**该部分代码未加,以后可考虑加上**)
->>
-		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-			File externalStorageDirectory = Environment.getExternalStorageDirectory();
-			String path = externalStorageDirectory.getAbsolutePath() + ConstantValue.IMAGE_PATH;
->>			
-			diskLruCache = DiskLruCache.openCache(GloableParams.context, new File(path), DIS_CACHE_SIZE);
-		}
+
+>> 针对图片优化的思想:
+>> ![](LruCache/ContraposeImageOptimize/1.png)
+>> ![](LruCache/ContraposeImageOptimize/2.png)
+>> ![](LruCache/ContraposeImageOptimize/3.png)
 
 ### AsyncTask
 > AsyncTask 线程池案例

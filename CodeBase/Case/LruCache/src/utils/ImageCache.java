@@ -2,15 +2,15 @@ package com.example.lrucachedemo.utils;
 
 import java.io.File;
 
-import com.example.lrucachedemo.ConstantValue;
-import com.example.lrucachedemo.GloableParams;
-
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Environment;
 import android.support.v4.util.LruCache;
 import android.util.Log;
+
+import com.example.lrucachedemo.ConstantValue;
+import com.example.lrucachedemo.GloableParams;
 
 /**
  * =================================================
@@ -66,10 +66,15 @@ public class ImageCache {
 			}
 		};
 
-		// sd卡是否挂在状态(有些手机可能没有SD卡)
+		// sd卡是否挂在状态(有些手机可能没有SD卡,就使用系统缓存目录)
 		if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
 			File externalStorageDirectory = Environment.getExternalStorageDirectory();
 			String path = externalStorageDirectory.getAbsolutePath() + ConstantValue.IMAGE_PATH;
+			
+			diskLruCache = DiskLruCache.openCache(GloableParams.context, new File(path), DIS_CACHE_SIZE);
+		}else{
+			File cacheDir = GloableParams.context.getCacheDir();
+			String path = cacheDir.getAbsolutePath() + ConstantValue.IMAGE_PATH;
 			
 			diskLruCache = DiskLruCache.openCache(GloableParams.context, new File(path), DIS_CACHE_SIZE);
 		}

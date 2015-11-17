@@ -67,7 +67,6 @@ public class MainActivity extends Activity {
 		
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			ImageCache.getInstance().put(position, bitmap);
 			ViewHodler viewHodler;
 			if(convertView==null){
 				viewHodler = new ViewHodler();
@@ -80,7 +79,16 @@ public class MainActivity extends Activity {
 			}
 			
 			viewHodler.textview.setText("第"+position+"张");
-			viewHodler.imageview.setImageBitmap(ImageCache.getInstance().get(position));
+			// 从内存或sd卡获取文件,获取不到访问网络获取
+			Bitmap bitmap2 = ImageCache.getInstance().get(position);
+			if(bitmap2==null){
+				// 从网络获取并添加在内存和sd卡上
+				ImageCache.getInstance().put(position, bitmap);
+			}
+			// 再去内存或sd卡上获取资源
+			bitmap2 = ImageCache.getInstance().get(position);
+			
+			viewHodler.imageview.setImageBitmap(bitmap2);
 			
 			return convertView;
 		}

@@ -23,6 +23,7 @@
 #####3.使用一下设置:
 
     <style name="atheme" parent="AppTheme">
+		<item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@android:style/Animation</item>
@@ -31,6 +32,6 @@
 
 #####问题解析:  
 **初步分析:**  
- 1.2.布局控件会变成黑色,且EditText控件下默认下划线无法显示
- 3.在华为手机上解决问题,在联想手机上会在切换Activity时会透明一下
+ 1.2.布局控件会变成黑色,且EditText控件下默认下划线无法显示  
+ 3.在android4.4.2上会在切换Activity时会透明一下,需要做个主题过滤`(values-v19)`
 

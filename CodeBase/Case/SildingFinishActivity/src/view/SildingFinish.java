@@ -31,7 +31,7 @@ import com.example.sildingfinishdemo.R;
  * 
  * 创建日期:2015-11-19 下午1:33:28
  * 
- * 描述:实现右滑finish掉Activity的控件.<b>该功能只能用在4.4.2(不含)以下的手机</b><br>设置该主题:<pre>android:theme="@android:style/Theme.Translucent"</pre>
+ * 描述:实现右滑finish掉Activity的控件.<b>该功能只能用在除4.4.2版本之外的手机上</b><br>设置该主题:<pre>android:theme="@android:style/Theme.Translucent"</pre>
  * 		<br>只需在activity的onCreate里初始化以下代码即可:<pre>
  *	SildingFinish layout = (SildingFinish) LayoutInflater.from(this).inflate(R.layout.base, null);
  *	layout.attachToActivity(this);</pre>

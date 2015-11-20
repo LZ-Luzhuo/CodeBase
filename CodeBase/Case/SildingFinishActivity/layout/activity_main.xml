@@ -44,6 +44,6 @@
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:text="注意:该案例只能在4.4.2(不含)以下的android版本才能正常运行" />
+        android:text="注意:该案例只能在除4.4.2之外的android版本才能正常运行" />
 
 </RelativeLayout>

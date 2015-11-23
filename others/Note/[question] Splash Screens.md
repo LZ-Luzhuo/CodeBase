@@ -33,9 +33,12 @@
 #####4.单独设置主题:
 	android:theme="@style/@android:style/Theme.Translucent"
 
+#####5.选择第4方案,并设置切换动画
+	overridePendingTransition(R.anim.tran_in, R.anim.tran_out);
+
 #####问题解析:  
 **初步分析:**  
  1.2.布局控件会变成黑色,且EditText控件下默认下划线无法显示  
  3.在android4.4.2上会在切换Activity时会透明一下,需要做个主题过滤`(values-v19)`  
  4.对第一个显示的activity单独配置该主题,虽然在4.4.2上切换时背景仍会透明一下,但该方案显然已经省去了很大一部分麻烦.
-
+ 5.完美解决.

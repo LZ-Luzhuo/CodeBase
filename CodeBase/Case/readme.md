@@ -68,3 +68,7 @@
 
 ### Drawable
 > drawable图片
+
+### Animation
+> 动画
+>> - Acitivity:Activity切换动画

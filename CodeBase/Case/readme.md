@@ -72,3 +72,4 @@
 ### Animation
 > 动画
 >> - Acitivity:Activity切换动画
+>> - View:View动画

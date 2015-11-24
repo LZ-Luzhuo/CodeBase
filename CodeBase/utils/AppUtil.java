@@ -54,4 +54,16 @@ public class AppUtil {
 		intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
 		context.startActivity(intent);
 	}
+	
+	/**
+	 * 卸载当前应用
+	 * @param context
+	 */
+	public static void uninstallApk(Context context){
+		Intent intent = new Intent();
+		intent.setAction("android.intent.action.DELETE");
+		intent.addCategory("android.intent.category.DEFAULT");
+		intent.setData(Uri.parse("package:"+context.getPackageName()));
+		context.startActivity(intent);
+	}
 }

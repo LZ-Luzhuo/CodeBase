@@ -1,14 +1,22 @@
 package com.example.appdemo.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlSerializer;
+
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
+import android.util.Xml;
 
 /**
  * =================================================
@@ -92,4 +100,126 @@ public class PhoneUtil {
 		public String name; // 姓名
 		public String phone; // 电话
 	}
+	
+	public interface BackUpCallBack {
+		/**
+		 * @param max 短信条数
+		 */
+		public void beforeBackup(int max);
+		/**
+		 * @param progress 已备份进度
+		 */
+		public void onSmsBackup(int progress);
+	}
+	
+	/**
+	 * 备份短信(请在辅助线程中运行)
+	 * 权限:"android.permission.WRITE_SMS",
+	 * "android.permission.READ_SMS"
+	 * @param file 文件保存目录(不含文件名,如:Environment.getExternalStorageDirectory())
+	 * @param callBack 备份进度回调
+	 */
+	public static void backupSms(Context context,File file, BackUpCallBack callBack) throws Exception {
+		ContentResolver resolver = context.getContentResolver();
+		File files = new File(file, "backupSms.xml");
+		FileOutputStream fos = new FileOutputStream(files);
+		
+		XmlSerializer serializer = Xml.newSerializer();
+		serializer.setOutput(fos, "utf-8");
+		serializer.startDocument("utf-8", true);
+		serializer.startTag(null, "smss");
+		
+		Uri uri = Uri.parse("content://sms/");
+		Cursor cursor = resolver.query(uri, new String[] { "body", "address", "type", "date" }, null, null, null);
+		int max = cursor.getCount();
+		callBack.beforeBackup(max);
+		serializer.attribute(null, "max", max + "");
+		int process = 0;
+		while (cursor.moveToNext()) {
+			String body = cursor.getString(0);
+			String address = cursor.getString(1);
+			String type = cursor.getString(2);
+			String date = cursor.getString(3);
+			serializer.startTag(null, "sms");
+
+			serializer.startTag(null, "body");
+			serializer.text(body);
+			serializer.endTag(null, "body");
+
+			serializer.startTag(null, "address");
+			serializer.text(address);
+			serializer.endTag(null, "address");
+
+			serializer.startTag(null, "type");
+			serializer.text(type);
+			serializer.endTag(null, "type");
+
+			serializer.startTag(null, "date");
+			serializer.text(date);
+			serializer.endTag(null, "date");
+
+			serializer.endTag(null, "sms");
+			process++;
+			callBack.onSmsBackup(process);
+		}
+		cursor.close();
+		serializer.endTag(null, "smss");
+		serializer.endDocument();
+		fos.close();
+	}
+	
+	/**
+	 * 还原短信(请在辅助线程中运行)
+	 * @param flag 是否删除原来的短信
+	 * @param file 短信备份文件的目录(不含文件名,如:Environment.getExternalStorageDirectory())
+	 * @param callBack 是否删除原来的短信
+	 * @throws Exception 
+	 */
+	public static void restoreSms(Context context, boolean flag,File file, BackUpCallBack callBack) throws Exception {
+		Uri uri = Uri.parse("content://sms/");
+		File files = new File(file, "backupSms.xml");
+		FileInputStream fis = new FileInputStream(files);
+		if (flag) {
+			context.getContentResolver().delete(uri, null, null);
+		}
+
+		int process = 0;
+		ContentValues values = null;
+		XmlPullParser parser = Xml.newPullParser();
+		parser.setInput(fis, "utf-8");
+		int type = parser.getEventType();
+		while(type != XmlPullParser.END_DOCUMENT){
+			String tagName = parser.getName();
+			switch (type) {
+			case XmlPullParser.START_TAG:
+				if("smss".equals(tagName)){
+					callBack.beforeBackup(Integer.parseInt(parser.getAttributeValue(null, "max")));
+				}else if("sms".equals(tagName)){
+					values = new ContentValues();
+				}else if("body".equals(tagName)){
+					values.put("body", parser.nextText());
+				}else if("address".equals(tagName)){
+					values.put("address", parser.nextText());
+				}else if("type".equals(tagName)){
+					values.put("type", parser.nextText());
+				}else if("date".equals(tagName)){
+					values.put("date", parser.nextText());
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				if("sms".equals(tagName)){
+					context.getContentResolver().insert(uri, values);
+					process ++;
+					callBack.onSmsBackup(process);
+				}
+				break;
+			default:
+				break;
+			}
+			type=parser.next();
+		}
+		fis.close();
+	}
+	
+	
 }

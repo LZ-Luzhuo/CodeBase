@@ -1,11 +1,15 @@
 package com.example.appdemo.utils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
 /**
@@ -65,5 +69,49 @@ public class AppUtil {
 		intent.addCategory("android.intent.category.DEFAULT");
 		intent.setData(Uri.parse("package:"+context.getPackageName()));
 		context.startActivity(intent);
+	}
+	
+	/**
+	 * 获取所有的安装的应用程序信息(耗时操作,请在辅助线程进行)
+	 * @return List<AppInfo>
+	 */
+	public static List<AppInfo> getAppInfos(Context context){
+		PackageManager pm = context.getPackageManager();
+		//所有的安装在系统上的应用程序包信息。
+		List<PackageInfo> packInfos = pm.getInstalledPackages(0);
+		List<AppInfo> appInfos = new ArrayList<AppInfo>();
+		for(PackageInfo packInfo : packInfos){
+			AppInfo appInfo = new AppInfo();
+			//packInfo  相当于一个应用程序apk包的清单文件
+			String packname = packInfo.packageName;
+			Drawable icon = packInfo.applicationInfo.loadIcon(pm);
+			String name = packInfo.applicationInfo.loadLabel(pm).toString();
+			int flags = packInfo.applicationInfo.flags;//应用程序信息的标记
+			if((flags&ApplicationInfo.FLAG_SYSTEM)==0){
+				appInfo.userApp=true;
+			}else{
+				appInfo.userApp=false;
+			}
+			if((flags&ApplicationInfo.FLAG_EXTERNAL_STORAGE)==0){
+				//手机的内存
+				appInfo.inRom=true;
+			}else{
+				//手机外存储设备
+				appInfo.inRom=false;
+			}
+			appInfo.packname=packname;
+			appInfo.icon=icon;
+			appInfo.name=name;
+			appInfos.add(appInfo);
+		}
+		return appInfos;
+	}
+	
+	public static class AppInfo {
+		public Drawable icon;
+		public String name;
+		public String packname;
+		public boolean inRom; //安装位置:true手机内存;falseSD卡
+		public boolean userApp; //用户应用:true用户应用;false系统
 	}
 }

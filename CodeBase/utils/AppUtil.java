@@ -101,6 +101,7 @@ public class AppUtil {
 			Drawable icon = packInfo.applicationInfo.loadIcon(pm);
 			String name = packInfo.applicationInfo.loadLabel(pm).toString();
 			int flags = packInfo.applicationInfo.flags;//应用程序信息的标记
+			int uid = packInfo.applicationInfo.uid;
 			if((flags&ApplicationInfo.FLAG_SYSTEM)==0){
 				appInfo.userApp=true;
 			}else{
@@ -113,9 +114,10 @@ public class AppUtil {
 				//手机外存储设备
 				appInfo.inRom=false;
 			}
-			appInfo.packname=packname;
-			appInfo.icon=icon;
-			appInfo.name=name;
+			appInfo.packname = packname;
+			appInfo.icon = icon;
+			appInfo.name = name;
+			appInfo.uid = uid;
 			appInfos.add(appInfo);
 		}
 		return appInfos;
@@ -125,6 +127,7 @@ public class AppUtil {
 		public Drawable icon;
 		public String name;
 		public String packname;
+		public int uid;
 		public boolean inRom; //安装位置:true手机内存;falseSD卡
 		public boolean userApp; //用户应用:true用户应用;false系统
 	}

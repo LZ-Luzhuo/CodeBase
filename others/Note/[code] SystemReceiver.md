@@ -74,3 +74,13 @@
 > - 过滤:`<action android:name="android.intent.action.NEW_OUTGOING_CALL" />`
 >
 		String phone = getResultData(); //号码
+
+## 锁屏(只有代码注册广播才有效)
+
+	// 代码注册锁屏广播
+	xxxReceiver receiver = new xxxReceiver();
+	IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+	context.registerReceiver(receiver, intentFilter);
+
+	//注销广播
+	//context.unregisterReceiver(receiver); 

@@ -80,3 +80,6 @@
 ### PopupWindow
 > PopupWindow使用的案例
 
+### AppWight
+> 桌面Wight的使用案例
+

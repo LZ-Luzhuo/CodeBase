@@ -333,4 +333,35 @@ public class AppUtil {
 		String packname = infos.get(0).topActivity.getPackageName();
 		return packname;
 	}
+	
+	/**
+	 * 开启Activity,在Activity里开启某个界面
+	 * @param cls 被开启的Activity
+	 */
+	public static void startActivityAC(Context context,Class<?> cls){
+		Intent intent = new Intent(context, cls);
+		context.startActivity(intent);
+	}
+	
+	/**
+	 * 开启Activity,在Service里开启某个界面
+	 * @param cls 被开启的Activity
+	 */
+	public static void startActivitySE(Context context, Class<?> cls){
+		Intent intent = new Intent(context, cls);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
+	}
+	
+	/**
+	 * 回到桌面,类似于按实体的主页键
+	 */
+	public static void backDesktop(Context context){
+		Intent intent = new Intent();
+		intent.setAction("android.intent.action.MAIN");
+		intent.addCategory("android.intent.category.HOME");
+		intent.addCategory("android.intent.category.DEFAULT");
+		intent.addCategory("android.intent.category.MONKEY");
+		context.startActivity(intent);
+	}
 }

@@ -79,7 +79,8 @@
 
 	// 代码注册锁屏广播
 	xxxReceiver receiver = new xxxReceiver();
-	IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+	IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);//锁屏
+	//IntentFilter intentFilter = new IntentFilter(Intent.ACTION_SCREEN_ON);//解屏
 	context.registerReceiver(receiver, intentFilter);
 
 	//注销广播

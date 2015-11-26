@@ -13,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -318,5 +319,18 @@ public class AppUtil {
 	public static void stopTask(Context context,String packName) {
 		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 		am.killBackgroundProcesses(packName);
+	}
+	
+	/**
+	 * 获取用户正在操作的App
+	 * 权限:"android.permission.GET_TASKS"
+	 * @param context
+	 * @return 用户正在操作的App的包名("com.example.appdemo")
+	 */
+	public static String getCurrentRunApp(Context context){
+		ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> infos = am.getRunningTasks(1); //获取在运行的任务栈
+		String packname = infos.get(0).topActivity.getPackageName();
+		return packname;
 	}
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.TrafficStats;
 import android.net.Uri;
 
 import com.example.lzchat.GlobalParams;
@@ -127,5 +128,60 @@ public class NetUtil {
 			}
 		}
 		return 0;
+	}
+	
+	/**
+	 * 获取指定app使用的总流量(所有网络接口流量,<b>从本次开机到现在的统计数据</b>)
+	 * @param uid 可以调用AppUtil.getAppInfos(Context)方法获取app的uid
+	 * @return Flux 流量类
+	 */
+	public static Flux getAppFlux(int uid){
+		//proc/uid_stat/10086
+		long tx = TrafficStats.getUidTxBytes(uid);//某个应用所有网络接口上传的流量byte
+		long rx = TrafficStats.getUidRxBytes(uid);//某个应用所有网络接口下载的流量 byte
+		
+		Flux flux = new Flux();
+		flux.TxBytes = tx;
+		flux.RxBytes = rx;
+		return flux;
+	}
+	
+	/**
+	 * 获取手机使用蜂窝的总流量(4g/3g/2g)
+	 * @return Flux 流量类
+	 */
+	public static Flux getMobileFlux(){
+		long mobileTxBytes = TrafficStats.getMobileTxBytes();//手机3g/2g上传的总流量
+		long mobileRxBytes = TrafficStats.getMobileRxBytes();//手机2g/3g下载的总流量
+		
+		Flux flux = new Flux();
+		flux.TxBytes = mobileTxBytes;
+		flux.RxBytes = mobileRxBytes;
+		return flux;
+	}
+	
+	/**
+	 * 获取手机所有网络接口的总流量(wifi/4g/3g/2g)
+	 * @return Flux 流量类
+	 */
+	public static Flux getTotalFlux(){
+		long totalTxBytes = TrafficStats.getTotalTxBytes();//手机全部网络接口 包括wifi，3g、2g上传的总流量
+		long totalRxBytes = TrafficStats.getTotalRxBytes();//手机全部网络接口 包括wifi，3g、2g下载的总流量
+		
+		Flux flux = new Flux();
+		flux.TxBytes = totalTxBytes;
+		flux.RxBytes = totalRxBytes;
+		return flux;
+	}
+	
+	public static class Flux{
+		/**
+		 * 上传的流量(-1表示不支持流量统计/没有产生流量)
+		 */
+		public long TxBytes;
+		/**
+		 * 下载的流量(-1表示不支持流量统计/没有产生流量)
+		 */
+		public long RxBytes;
 	}
 }

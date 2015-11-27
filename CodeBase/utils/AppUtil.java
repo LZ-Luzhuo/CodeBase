@@ -367,4 +367,48 @@ public class AppUtil {
 		intent.addCategory("android.intent.category.MONKEY");
 		context.startActivity(intent);
 	}
+	
+	/**
+	 * 获取应用的包信息
+	 * @param context
+	 */
+	public static List<SimplPackageInfo> getPackageInfo(Context context){
+		List<SimplPackageInfo> packageinfos = new ArrayList<SimplPackageInfo>();
+		
+		PackageManager pm = context.getPackageManager();
+		List<PackageInfo>  infos = pm.getInstalledPackages(0);
+		for(PackageInfo info:infos){
+			String datadir = info.applicationInfo.dataDir; //app包的包路径
+			String sourcedir = info.applicationInfo.sourceDir;//apk文件路径
+			String name = info.applicationInfo.loadLabel(pm).toString(); //应用程序名称
+			String packageName = info.packageName; //app的包名
+			
+			SimplPackageInfo simplPackageInfo = new SimplPackageInfo();
+			simplPackageInfo.apkDir = sourcedir;
+			simplPackageInfo.name = name;
+			simplPackageInfo.packageName = packageName;
+			simplPackageInfo.resourceDir = datadir;
+			packageinfos.add(simplPackageInfo);
+		}
+		return packageinfos;
+	}
+	
+	public static class SimplPackageInfo{
+		/**
+		 * apk文件路径
+		 */
+		public String apkDir;
+		/**
+		 * apk的包路径
+		 */
+		public String resourceDir;
+		/**
+		 * apk应用名
+		 */
+		public String name;
+		/**
+		 * apk包名
+		 */
+		public String packageName;
+	}
 }

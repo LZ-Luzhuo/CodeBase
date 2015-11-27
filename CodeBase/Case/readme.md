@@ -83,3 +83,5 @@
 ### AppWight
 > 桌面Wight的使用案例
 
+### SlidingDrawer
+> 滑动抽屉的案例

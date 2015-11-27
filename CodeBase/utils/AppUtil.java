@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +18,18 @@ import android.app.ActivityManager.RunningTaskInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.IPackageDataObserver;
+import android.content.pm.IPackageStatsObserver;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageStats;
 import android.content.pm.ResolveInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.RemoteException;
 
 /**
  * =================================================
@@ -410,5 +415,91 @@ public class AppUtil {
 		 * apk包名
 		 */
 		public String packageName;
+	}
+	
+	/**
+	 * 扫描手机里面所有应用程序的缓存信息
+	 * 权限:"android.permission.GET_PACKAGE_SIZE"
+	 * @return  CacheInfo缓存信息的集合
+	 */
+	public static List<CacheInfo> scanCache(Context context) {
+		List<CacheInfo> cacheInfos = new ArrayList<CacheInfo>();
+
+		// 通过反射获得getPackageSizeInfo()方法
+		Method getPackageSizeInfoMethod = null;
+		Method[] methods = PackageManager.class.getMethods();
+		for (Method method : methods) {
+			if ("getPackageSizeInfo".equals(method.getName())) {
+				getPackageSizeInfoMethod = method;
+			}
+		}
+		
+		PackageManager pm = context.getPackageManager();
+		List<PackageInfo> packInfos = pm.getInstalledPackages(0);
+		for (PackageInfo packInfo : packInfos) {
+			try {
+				final CacheInfo cacheInfo = new CacheInfo();
+				String name = packInfo.applicationInfo.loadLabel(pm).toString();
+				getPackageSizeInfoMethod.invoke(pm, packInfo.packageName, new IPackageStatsObserver.Stub(){
+					@Override
+					public void onGetStatsCompleted(PackageStats pStats, boolean succeeded) throws RemoteException {
+						long cache = pStats.cacheSize; //缓存大小
+						long code = pStats.codeSize; //代码大小
+						long data = pStats.dataSize; //数据大小
+						String packageName = pStats.packageName;
+						
+						cacheInfo.code = code;
+						cacheInfo.data = data;
+						cacheInfo.cache = cache;
+						cacheInfo.packageName = packageName;
+					}
+				});
+				cacheInfo.name = name;
+				cacheInfos.add(cacheInfo);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return cacheInfos;
+	}
+	
+	public static class CacheInfo{
+		public String name; //应用名
+		/**
+		 * app的大小byte
+		 */
+		public long code;
+		/**
+		 * 数据的大小byte
+		 */
+		public long data;
+		/**
+		 * 缓存的大小byte
+		 */
+		public long cache;
+		public String packageName; //包名
+	}
+	
+	/**
+	 * 清理手机的全部缓存(系统不允许对单个应用进行缓存清理)<b>注意:该方法并不能清除全部缓存,并且会导致{@link AppUtil#scanCache(Context)}获取数据错误.</b>
+	 */
+	@Deprecated
+	public static void clearAllCache(Context context){
+		PackageManager pm = context.getPackageManager();
+		Method[] methods = PackageManager.class.getMethods();
+		for(Method method:methods){
+			if("freeStorageAndNotify".equals(method.getName())){
+				try {
+					method.invoke(pm, Integer.MAX_VALUE,new IPackageDataObserver.Stub(){
+						@Override
+						public void onRemoveCompleted(String packageName,boolean succeeded) throws RemoteException {
+						}
+					});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return;
+			}
+		}
 	}
 }

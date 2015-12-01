@@ -95,3 +95,5 @@
 ### GalleryFlow
 > 画廊流案例
 
+### DragLayout
+> 侧滑面板的案例

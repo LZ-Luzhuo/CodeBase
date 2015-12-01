@@ -1,0 +1,35 @@
+<com.example.sideslippanel.widget.DragLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/draglayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context=".MainActivity" >
+
+    <!-- 左面板 -->
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:paddingBottom="50dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="50dp"
+        android:paddingTop="50dp" >
+        
+        <include layout="@layout/leftcontent"/>
+        
+    </LinearLayout>
+
+    <!-- 主面板 -->
+    <com.example.sideslippanel.widget.MLinearLayout
+        android:id="@+id/mlinear"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#ffffff"
+        android:orientation="vertical" >
+        
+        <include layout="@layout/rightcontent"/>
+	
+    </com.example.sideslippanel.widget.MLinearLayout>
+
+</com.example.sideslippanel.widget.DragLayout>

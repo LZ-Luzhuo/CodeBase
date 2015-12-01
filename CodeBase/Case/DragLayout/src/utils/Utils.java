@@ -1,4 +1,4 @@
-package com.example.sideslippanel.utils;
+package com.example.quickindexbar.utils;
 
 import android.content.Context;
 import android.graphics.Rect;
@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 public class Utils {
 
-	public static Toast quickToast;
+	private static Toast quickToast;
 
 	/**
 	 * 快速显示的吐司

@@ -97,3 +97,7 @@
 
 ### DragLayout
 > 侧滑面板的案例
+
+### QuickIndexBar
+> 快速索引条
+>> - 用于字母快速定位联系人

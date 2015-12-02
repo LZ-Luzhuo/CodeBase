@@ -73,4 +73,41 @@ public class PinYin {
 		}
 		return "";
 	}
+	
+	/**
+	 * 根据传入的字符串(包含汉字),得到拼音;不对特殊字符进行处理
+	 * <b>拼音 --> PINYIN;拼 音-->PINYIN;拼音aa-->PINYINaa;拼音@#-->PINYIN@#</b>
+	 * @param str 字符串
+	 * @return
+	 */
+	public static String getPinyin(String str) {
+		HanyuPinyinOutputFormat format = new HanyuPinyinOutputFormat();
+		format.setCaseType(HanyuPinyinCaseType.UPPERCASE);
+		format.setToneType(HanyuPinyinToneType.WITHOUT_TONE);
+		
+		StringBuilder sb = new StringBuilder();
+		
+		char[] charArray = str.toCharArray();
+		for (int i = 0; i < charArray.length; i++) {
+			char c = charArray[i];
+			// 如果是空格, 跳过
+			if(Character.isWhitespace(c)){
+				continue;
+			}
+			if(c >= -127 && c < 128){
+				// 肯定不是汉字
+				sb.append(c);
+			}else {
+				String s = "";
+				try {
+					s = PinyinHelper.toHanyuPinyinStringArray(c, format)[0];
+					sb.append(s);
+				} catch (BadHanyuPinyinOutputFormatCombination e) {
+					e.printStackTrace();
+					sb.append(s);
+				}
+			}
+		}
+		return sb.toString();
+	}
 }

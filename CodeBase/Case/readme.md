@@ -101,3 +101,8 @@
 ### QuickIndexBar
 > 快速索引条
 >> - 用于字母快速定位联系人
+
+### ParallaxListView
+> 视差特效listview
+>> - 用于空间展示
+

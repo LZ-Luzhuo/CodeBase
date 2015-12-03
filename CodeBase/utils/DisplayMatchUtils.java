@@ -2,7 +2,9 @@ package com.example.demo;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
@@ -95,5 +97,18 @@ public class DisplayMatchUtils {
 		// 宽占50％(+ 0.5f是为了减少精度损失)
 		//LinearLayout.LayoutParams params = new LinearLayout.LayoutParams((int) (width*0.5f + 0.5f), LayoutParams.MATCH_PARENT);
 		//new Button(this).setLayoutParams(params);
+	}
+	
+	/** 获取状态栏高度
+	 * @param v
+	 * @return
+	 */
+	public static int getStatusBarHeight(View v) {
+		if (v == null) {
+			return 0;
+		}
+		Rect frame = new Rect();
+		v.getWindowVisibleDisplayFrame(frame);
+		return frame.top;
 	}
 }

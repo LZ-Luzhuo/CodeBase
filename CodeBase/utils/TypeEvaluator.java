@@ -27,7 +27,7 @@ public class TypeEvaluator {
 	 * @param endValue 结束颜色
 	 * @return 估值后的颜色
 	 */
-    public Object evaluate(float fraction, Object startValue, Object endValue) {
+    public static Object evaluate(float fraction, Object startValue, Object endValue) {
         int startInt = (Integer) startValue;
         int startA = (startInt >> 24) & 0xff;
         int startR = (startInt >> 16) & 0xff;
@@ -53,7 +53,7 @@ public class TypeEvaluator {
      * @param endValue 结束值
      * @return 评估值
      */
-    public Float evaluate(float fraction, Number startValue, Number endValue) {
+    public static Float evaluate(float fraction, Number startValue, Number endValue) {
         float startFloat = startValue.floatValue();
         return startFloat + fraction * (endValue.floatValue() - startFloat);
     }
@@ -65,7 +65,7 @@ public class TypeEvaluator {
      * @param endValue 结束值
      * @return 评估值
      */
-    public Integer evaluate(float fraction, Integer startValue, Integer endValue) {
+    public static Integer evaluate(float fraction, Integer startValue, Integer endValue) {
         int startInt = startValue;
         return (int)(startInt + fraction * (endValue - startInt));
     }
@@ -77,7 +77,7 @@ public class TypeEvaluator {
      * @param endValue 开始的形状
      * @return 估值的形状
      */
-    public Rect evaluate(float fraction, Rect startValue, Rect endValue) {
+    public static Rect evaluate(float fraction, Rect startValue, Rect endValue) {
         return new Rect(startValue.left + (int)((endValue.left - startValue.left) * fraction),
                 startValue.top + (int)((endValue.top - startValue.top) * fraction),
                 startValue.right + (int)((endValue.right - startValue.right) * fraction),

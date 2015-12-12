@@ -114,5 +114,9 @@
 > 粘性圆点
 >> - 用于未读提醒 以及清除
 
+### Uncoupled
+> 解耦方案
+>> -  AbstractClass+ConfigFile
+>>> 抽象类 + 配置文件
 
 

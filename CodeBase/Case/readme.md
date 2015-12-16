@@ -119,4 +119,12 @@
 >> -  AbstractClass+ConfigFile
 >>> 抽象类 + 配置文件
 
+### CursorAdapter
+> CursorAdapter的使用案例
+>> - CursorAdapter的自动更新
+>> - 原生的操作数据库方式
+>> - 内容提供者操作数据库方式
+>> - 原生的访问数据库
+>> - 异步帮助类访问数据库
+
 

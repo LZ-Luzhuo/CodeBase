@@ -26,14 +26,12 @@ import com.example.cursoradapterdemo.bean.Person;
  **/
 public class Dao {
 	private DemoOpenHelper helper;
-	private SQLiteDatabase db;
 	private Context context;
 	private Uri uri = Uri.parse("content://dao/person");
 
 	public Dao(Context context) {
 		this.context = context;
 		helper = DemoOpenHelper.getInstance(context);
-		db = helper.getWritableDatabase();
 	}
 	
 	/**
@@ -42,6 +40,7 @@ public class Dao {
 	 * @return 返回插入行/-1插入失败
 	 */
 	public long insert(Person person) {
+		SQLiteDatabase db = helper.getWritableDatabase();
 		if(db.isOpen()) {
 			ContentValues values = new ContentValues();
 			values.put("name", person.name);
@@ -61,6 +60,7 @@ public class Dao {
 	 * @return Cursor/null
 	 */
 	public Cursor findAll() {
+		SQLiteDatabase db = helper.getReadableDatabase();
 		if(db.isOpen()) {
 			Cursor cursor = db.query(DemoOpenHelper.TABLE_PERSONS_TABLENAME, null, null, null, null, null, null);
 			cursor.setNotificationUri(context.getContentResolver(), uri); //给游标结果集设置一个通知的uri

@@ -85,3 +85,22 @@
 
 	//注销广播
 	//context.unregisterReceiver(receiver); 
+
+## App应用安装
+> - 过滤:
+
+	<action android:name="android.intent.action.PACKAGE_ADDED" />
+	<data android:scheme="package" />
+
+>
+	String packageName = intent.getDataString().substring(8);  // 包名
+
+## App应用卸载
+> - 过滤:
+
+	<action android:name="android.intent.action.PACKAGE_REMOVED" />
+	<data android:scheme="package" />
+
+>
+	String packageName = intent.getDataString().substring(8);  // 包名
+

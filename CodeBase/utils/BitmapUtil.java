@@ -1,6 +1,7 @@
 package com.example.utilsdemo.utils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -9,6 +10,8 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 
 /**
@@ -70,5 +73,22 @@ public class BitmapUtil {
 			e.printStackTrace();
 		}
 		return image;
+	}
+	
+	/**
+	 * 将Drawable保存到文件
+	 */
+	public static void saveDrawable(Drawable drawable, File file) throws Exception{
+		Bitmap bitmap=((BitmapDrawable)drawable).getBitmap(); // 先把Drawable转成Bitmap
+		saveBitmap(bitmap, file);
+	}
+	
+	/**
+	 * 将Bitmap保存到文件
+	 */
+	public static void saveBitmap(Bitmap bitmap, File file) throws Exception{
+		FileOutputStream fop = new FileOutputStream(file);
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, fop); // 格式可以为jpg,png,jpg不能存储透明
+		fop.close();
 	}
 }

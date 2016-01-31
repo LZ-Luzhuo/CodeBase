@@ -502,4 +502,20 @@ public class AppUtil {
 			}
 		}
 	}
+	
+	/**
+	 * 根据包名获取图标
+	 * @return Drawable/null
+	 */
+	public static Drawable getAppIcon(Context context,String packname){
+		PackageManager pm = context.getPackageManager();
+		//所有的安装在系统上的应用程序包信息。
+		List<PackageInfo> packInfos = pm.getInstalledPackages(0);
+		for(PackageInfo packInfo : packInfos){
+			if(packname.equals(packInfo.packageName)){
+				return packInfo.applicationInfo.loadIcon(pm);
+			}
+		}
+		return null;
+	}
 }

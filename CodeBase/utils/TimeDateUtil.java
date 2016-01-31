@@ -1,5 +1,7 @@
 package com.example.appdemo.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -97,5 +99,16 @@ public class TimeDateUtil {
 		public void onTask(long millisUntilFinished) {}
 		public void onFinish() {}
 		public void onTask() {}
+	}
+	
+	/**
+	 * 格式化时间(格式:"上次更新: yyyy-MM-dd")
+	 * @param dates
+	 * @return
+	 */
+	public static String getStringDate(long dates){
+		Date date = new Date(dates);
+		SimpleDateFormat sdf = new SimpleDateFormat("上次更新: yyyy-MM-dd");
+		return sdf.format(date);
 	}
 }

@@ -1,6 +1,11 @@
 package com.example.appdemo.utils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,5 +43,40 @@ public class StreamUtil {
 		String result = baos.toString();
 		baos.close();
 		return result;
+	}
+	
+	/**
+	 * 拷贝文件
+	 * @param shujuyuan
+	 * @param file
+	 * @throws IOException
+	 */
+	public static void copyFile(File shujuyuan, File file) {
+		BufferedInputStream bis = null;
+		BufferedOutputStream bos = null;
+		try{
+			if(!file.getParentFile().exists()) file.getParentFile().mkdirs();
+			if(!file.exists()) file.createNewFile();
+			
+			bis = new BufferedInputStream(new FileInputStream(shujuyuan));
+			bos = new BufferedOutputStream(new FileOutputStream(file));
+			
+			byte[] bys = new byte[1024];
+			int len = 0;
+			while((len=bis.read(bys))!=-1){
+				bos.write(bys,0,len);
+				bos.flush();
+			}
+		}catch(Exception e){ e.printStackTrace();
+		}finally{
+			if(bos!=null)
+				try {
+					bos.close();
+				} catch (Exception e) { }
+			if(bis!=null)
+				try {
+					bis.close();
+				} catch (Exception e) { }
+		}
 	}
 }

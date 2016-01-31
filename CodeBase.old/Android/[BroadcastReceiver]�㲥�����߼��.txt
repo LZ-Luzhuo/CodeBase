@@ -54,3 +54,39 @@ public class ReceiverDemo extends BroadcastReceiver {
 //===========================================================
 
 
+
+
+//-----------------------------------------------------------
+// 1.软件安装卸载的广播(实际应用案例)
+//===========================================================
+
+/**
+ * 安装卸载的广播
+ */
+private NewAppReceiver appReceiver = new NewAppReceiver(){
+	@Override
+	public void onReceive(Context context, Intent intent) {
+		// 安装应用广播
+        	if (intent.getAction().equals("android.intent.action.PACKAGE_ADDED")) {
+            		String packageName = intent.getDataString().substring(8);
+        	}
+        
+        	// 卸载广播
+        	if (intent.getAction().equals("android.intent.action.PACKAGE_REMOVED")) {
+        		String packageName = intent.getDataString().substring(8);
+        	}
+	}
+};
+
+//=========================清单文件配置==================================
+
+//广播接收者清单配置
+<receiver android:name="com.luzhuo.lemon.lemonapprecorder.receiver.NewAppReceiver" >
+	<intent-filter>
+		<action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+	</intent-filter>
+</receiver>
+
+//===========================================================

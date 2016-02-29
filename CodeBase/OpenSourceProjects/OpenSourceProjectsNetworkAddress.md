@@ -42,6 +42,7 @@
  - [HaoService](http://www.haoservice.com/)
  - [聚合数据](https://www.juhe.cn/)
  - [酷传](http://www.coolchuan.com/)
+ - [融云](http://www.rongcloud.cn/)
 
 # 快速开发框架
  - [xUtils](https://github.com/wyouflf/xUtils): DbUtils(orm:对象关系型映射),ViewUtils(ioc:控制反转),HttpUtils,BitmapUtils

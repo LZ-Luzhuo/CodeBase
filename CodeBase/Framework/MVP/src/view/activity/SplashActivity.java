@@ -1,5 +1,7 @@
-package com.example.mvpdemo;
+package com.example.mvpdemo.view.activity;
 
+import com.example.mvpdemo.R;
+import com.example.mvpdemo.R.layout;
 import com.example.mvpdemo.presenter.SplashPersenter;
 import com.example.mvpdemo.view.ISplashView;
 

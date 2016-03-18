@@ -118,7 +118,8 @@ public class MainActivity extends Activity {
         	return;
         	
         case GET_CROP_IMAGE:
-        	imageView.setImageURI(Uri.fromFile(outUrl));
+        	if(data != null)
+        		imageView.setImageURI(Uri.fromFile(outUrl));
         	return;
 		}
 	}

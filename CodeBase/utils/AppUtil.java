@@ -518,4 +518,38 @@ public class AppUtil {
 		}
 		return null;
 	}
+	
+	/**
+	* 获取手机型号,手机Android版本号
+	*/
+	public static EquipmentVersions getEquipmentVersions() {
+		EquipmentVersions equipmentVer = new EquipmentVersions();
+		// GT-N7108 获取手机型号
+		equipmentVer.EquipmentModel = Build.MODEL;
+		// 18 获取版本号(数字)
+		equipmentVer.AndroidSDKInt = Build.VERSION.SDK_INT;
+		// 4.3 获取版本号(文本)
+		equipmentVer.AndroidSDKStr = Build.VERSION.RELEASE;
+		return equipmentVer;
+	}
+	
+	/**
+	* 设备版本类
+	*/
+	public static class EquipmentVersions{
+		/**
+		 * GT-N7108 获取手机型号
+		 */
+		public String EquipmentModel;
+		
+		/**
+		 * 18 获取版本号(数字)
+		 */
+		public int AndroidSDKInt;
+		
+		/**
+		 * 4.3 获取版本号(文本)
+		 */
+		public String AndroidSDKStr;
+	}
 }

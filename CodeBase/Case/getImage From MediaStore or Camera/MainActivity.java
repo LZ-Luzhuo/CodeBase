@@ -108,15 +108,18 @@ public class MainActivity extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
         case GET_MEDIASTORE_IMAGE:
-        	imageView.setImageURI(Uri.fromFile(sdcardTempFile));
+        	if(data != null)
+        		imageView.setImageURI(Uri.fromFile(sdcardTempFile));
         	return;
         	
         case GET_CAMERA_IMAGE:
-        	imageView.setImageURI(Uri.fromFile(sdcardTempFile));
+        	if(data != null)
+        		imageView.setImageURI(Uri.fromFile(sdcardTempFile));
         	return;
         	
         case GET_CROP_IMAGE:
-        	imageView.setImageURI(Uri.fromFile(outUrl));
+        	if(data != null)
+        		imageView.setImageURI(Uri.fromFile(outUrl));
         	return;
 		}
 	}

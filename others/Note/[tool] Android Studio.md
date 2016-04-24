@@ -121,3 +121,4 @@
 > - F8:调试
 > - Ctrl+Alt+f:变成成员变量
 > - Ctrl+Alt+l:格式化
+> - Ctrl+Shift+u:大小写

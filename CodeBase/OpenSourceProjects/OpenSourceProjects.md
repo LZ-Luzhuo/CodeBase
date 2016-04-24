@@ -11,6 +11,12 @@
 	> - ![](Resource\XCL-Charts01.png)
 	> - [XCL-Charts-master.zip](https://github.com/xcltapestry/XCL-Charts)
 	> - {Latest commit 542b068  on 26 Oct 2015}
-	> - {.../CodeBase/OpenSourceProjects/Code/XCL-Charts}(使用时删除library下的图标)
+	> - {.../CodeBase/OpenSourceProjects/Code/XCL-Charts}(浣跨敤鏃跺垹闄ibrary涓嬬殑鍥炬爣)
+
+> - **RoundedImageView**
+	> - ![](Resource\roundedimageview.png)
+	> - [RoundedImageView](https://github.com/vinc3m1/RoundedImageView)
+	> - compile 'com.makeramen:roundedimageview:2.2.1'
+	> - {.../CodeBase/OpenSourceProjects/Code/RoundedImageView}
 
 > - ****

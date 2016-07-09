@@ -1,16 +1,33 @@
-package com.example.mvpdemo.presenter;
+package me.luzhuo.mvp.presenter;
 
-import com.example.mvpdemo.model.INetWork;
-import com.example.mvpdemo.model.impl.INetWorkImpl;
-import com.example.mvpdemo.view.ISplashView;
+import android.text.TextUtils;
+
+import me.luzhuo.mvp.callback.GlobalNetCallBack;
+import me.luzhuo.mvp.callback.impl.BaseGlobalNetCallBack;
+import me.luzhuo.mvp.model.INetWork;
+import me.luzhuo.mvp.model.impl.INetWorkImpl;
+import me.luzhuo.mvp.ui.view.ISplashView;
 
 /**
- * 处理ui显示逻辑
- * @author Luzhuo
- */
+ * =================================================
+ * <p>
+ * Author: Luzhuo
+ * <p>
+ * Version: 1.0
+ * <p>
+ * Creation Date: 2016/7/8 16:46
+ * <p>
+ * Description: 控制层, 处理model和ui之间的逻辑
+ * <p>
+ * Revision History:
+ * <p>
+ * Copyright: Copyright 2016 Luzhuo. All rights reserved.
+ * <p>
+ * =================================================
+ **/
 public class SplashPersenter {
-	INetWork mINetWork;
-	ISplashView mISplashView;
+	private INetWork mINetWork;
+	private ISplashView mISplashView;
 	
 	public SplashPersenter(ISplashView iSplashView){
 		super();
@@ -20,11 +37,16 @@ public class SplashPersenter {
 	
 	public void doUILogic(){
 		mISplashView.showLoadingDialog();
-		if(mINetWork.isNetWorkOk()){
-			mISplashView.startNextActivity();
-		}else{
-			mISplashView.showNextWorkError();
-		}
-		mISplashView.hideLoadingDialog();
+		mINetWork.getNetData(callback);
 	}
+
+	GlobalNetCallBack callback = new BaseGlobalNetCallBack(){
+		@Override
+		public void netData(String data) {
+			if(!TextUtils.isEmpty(data)) mISplashView.startNextActivity();
+			else mISplashView.showNextWorkError();
+
+			mISplashView.hideLoadingDialog();
+		}
+	};
 }
